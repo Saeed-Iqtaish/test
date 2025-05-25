@@ -1,3 +1,14 @@
+:root {
+  --main: #FF6B6B;
+  --happy: #FFD93D;
+  --cozy: #FFE5B4;
+  --relaxed: #CDB4DB;
+  --energetic: #FFAD69;
+  --diet: #A8D5BA;
+  --allergy: #FF6B6B;
+  --dark: #011627;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

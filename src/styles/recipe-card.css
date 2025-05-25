@@ -1,0 +1,27 @@
+
+/* Recipe Cards */
+.card {
+  transition: transform 0.2s;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+  font-size: 1rem;
+}
+
+.card-text {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* Ensure cards fill columns evenly */
+.row > .col > .card {
+  height: 100%;
+}

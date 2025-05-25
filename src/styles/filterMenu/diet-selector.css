@@ -1,0 +1,26 @@
+/* === Diet Selector === */
+.diet-selector h6 {
+  color: #011627;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.diet-selector .btn {
+  border-radius: 20px !important;
+  padding: 0.4rem 1rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  margin-right: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+  border: 2px solid #A8D5BA !important;
+  color: #A8D5BA !important;
+  background: transparent !important;
+}
+
+.diet-selector .btn-check:checked + .btn {
+  background-color: #A8D5BA !important;
+  color: white !important;
+}

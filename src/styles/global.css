@@ -1,0 +1,64 @@
+:root {
+  --main: #FF6B6B;
+  --happy: #FFD93D;
+  --cozy: #FFE5B4;
+  --relaxed: #CDB4DB;
+  --energetic: #FFAD69;
+  --diet: #A8D5BA;
+  --allergy: #FF6B6B;
+  --dark: #2E2E2E;
+  --light: #FFFFFF;
+  --gray: #6C757D;
+}
+
+body {
+  background: #FAFAFA;
+  font-family: 'Inter', sans-serif;
+  color: var(--dark);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+/* Filter Button Styles */
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: 1px solid var(--main);
+  background: white;
+  color: var(--main);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.filter-button:hover {
+  background: #fff3f3;
+  border-color: var(--main);
+}
+
+.filter-button.active {
+  background: var(--main);
+  color: white;
+  border-color: var(--main);
+}
+
+.filter-icon {
+  font-size: 1.1rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .filter-button {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
+}

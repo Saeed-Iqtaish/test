@@ -1,0 +1,59 @@
+
+/* === Mood Selector === */
+.mood-selector h6 {
+  color: #011627;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* Default styling for buttons */
+.mood-selector .btn {
+  border-radius: 20px !important;
+  padding: 0.4rem 1rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  margin-right: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+  background: transparent !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Mood-specific outline and checked styles */
+.mood-selector #mood-Happy + .btn {
+  border: 2px solid #FFD93D !important;
+  color: #FFD93D !important;
+}
+.mood-selector #mood-Happy:checked + .btn {
+  background-color: #FFD93D !important;
+  color: white !important;
+}
+
+.mood-selector #mood-Cozy + .btn {
+  border: 2px solid #D39C74  !important;
+  color: #D39C74  !important;
+}
+.mood-selector #mood-Cozy:checked + .btn {
+  background-color: #D39C74  !important;
+  color: white !important;
+}
+
+.mood-selector #mood-Relaxed + .btn {
+  border: 2px solid #CDB4DB !important;
+  color: #CDB4DB !important;
+}
+.mood-selector #mood-Relaxed:checked + .btn {
+  background-color: #CDB4DB !important;
+  color: white !important;
+}
+
+.mood-selector #mood-Energetic + .btn {
+  border: 2px solid #FFAD69 !important;
+  color: #FFAD69 !important;
+}
+.mood-selector #mood-Energetic:checked + .btn {
+  background-color: #FFAD69 !important;
+  color: white !important;
+}
