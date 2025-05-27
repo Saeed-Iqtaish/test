@@ -3,7 +3,14 @@ import axios from "axios";
 import { Row, Col, Spinner, Alert } from "react-bootstrap";
 import RecipeCard from "./RecipeCard";
 
-function RecipeList({ search, diet, allergy, mood }) {
+function RecipeList({ 
+  search, 
+  diet, 
+  allergy, 
+  mood, 
+  isCommunityList = false,
+  refreshTrigger = 0
+}) {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,49 +31,70 @@ function RecipeList({ search, diet, allergy, mood }) {
     return "Happy";
   }, []);
 
+  const fetchSpoonacularRecipes = useCallback(async (controller) => {
+    const response = await axios.get("https://api.spoonacular.com/recipes/complexSearch", {
+      signal: controller.signal,
+      params: {
+        apiKey: "68f91166a81747958d41b82fa5f038c9",
+        number: 12,
+        addRecipeInformation: true,
+        query: search || "",
+        diet: diet.length > 0 ? diet[0].toLowerCase() : undefined,
+        intolerances: allergy.length > 0 ? allergy.join(",").toLowerCase() : undefined,
+      },
+    });
+
+    const recipesWithMood = response.data.results.map((r) => ({
+      ...r,
+      mood: assignMood(r),
+    }));
+
+    return mood.length > 0
+      ? recipesWithMood.filter((r) => mood.includes(r.mood))
+      : recipesWithMood;
+  }, [search, diet, allergy, mood, assignMood]);
+
+  const fetchCommunityRecipes = useCallback(async (controller) => {
+    const response = await axios.get("/api/community", { signal: controller.signal });
+    let filteredRecipes = response.data;
+
+    if (search) {
+      filteredRecipes = filteredRecipes.filter(recipe =>
+        recipe.title.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    filteredRecipes = filteredRecipes.map(r => ({
+      ...r,
+      mood: assignMood(r),
+    }));
+
+    if (mood.length > 0) {
+      filteredRecipes = filteredRecipes.filter(r => mood.includes(r.mood));
+    }
+
+    return filteredRecipes;
+  }, [search, mood, assignMood]);
+
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
     setError("");
 
-    console.log("Fetching with:", { search, diet, allergy, mood });
+    const fetchFunction = isCommunityList ? fetchCommunityRecipes : fetchSpoonacularRecipes;
 
-    axios
-      .get("https://api.spoonacular.com/recipes/complexSearch", {
-        signal: controller.signal,
-        params: {
-          apiKey: "68f91166a81747958d41b82fa5f038c9",
-          number: 12,
-          addRecipeInformation: true,
-          query: search || "",
-          diet: diet.length > 0 ? diet[0].toLowerCase() : undefined,
-          intolerances: allergy.length > 0 ? allergy.join(",").toLowerCase() : undefined,
-        },
-      })
-      .then((res) => {
-        const recipesWithMood = res.data.results.map((r) => ({
-          ...r,
-          mood: assignMood(r),
-        }));
-
-        const finalList =
-          mood.length > 0
-            ? recipesWithMood.filter((r) => mood.includes(r.mood))
-            : recipesWithMood;
-
-        setRecipes(finalList);
-      })
+    fetchFunction(controller)
+      .then(setRecipes)
       .catch((err) => {
-        console.error("API Error:", err);
-        if (err.response) {
-          // The request was made and the server responded with a status code
-          setError(`API Error: ${err.response.status} - ${err.response.data.message}`);
-        } else if (err.request) {
-          // The request was made but no response was received
-          setError("Network error - please check your connection");
-        } else {
-          // Something happened in setting up the request
-          setError("Request setup error");
+        if (!axios.isCancel(err)) {
+          console.error("API Error:", err);
+          if (err.response) {
+            setError(`API Error: ${err.response.status} - ${err.response.data.message}`);
+          } else if (err.request) {
+            setError("Network error - please check your connection");
+          } else {
+            setError("Request setup error");
+          }
         }
       })
       .finally(() => {
@@ -74,7 +102,7 @@ function RecipeList({ search, diet, allergy, mood }) {
       });
 
     return () => controller.abort();
-  }, [search, diet, allergy, mood, assignMood]);
+  }, [isCommunityList, fetchSpoonacularRecipes, fetchCommunityRecipes, refreshTrigger]);
 
   if (loading) return <Spinner animation="border" />;
   if (error) return <Alert variant="danger">{error}</Alert>;
@@ -84,7 +112,7 @@ function RecipeList({ search, diet, allergy, mood }) {
     <Row xs={1} sm={2} md={3} lg={4} className="g-4">
       {recipes.map((recipe) => (
         <Col key={recipe.id} className="d-flex">
-          <RecipeCard recipe={recipe} />
+          <RecipeCard recipe={recipe} isCommunityRecipe={isCommunityList} />
         </Col>
       ))}
     </Row>

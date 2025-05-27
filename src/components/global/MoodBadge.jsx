@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge } from "react-bootstrap";
-import "../../styles/mood-badge.css"
+import "../../styles/global/mood-badge.css"
 
 function MoodBadge({ mood }) {
   return (

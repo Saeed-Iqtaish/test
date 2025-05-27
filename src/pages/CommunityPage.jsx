@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
-import { FiFilter } from "react-icons/fi";
-import SearchBar from "./components/global/SearchBar";
-import FilterPanel from "./components/filterPanel/FilterPanel";
-import RecipeList from "./components/global/RecipeList";
-import "./styles/global/global.css"
+import CommunityHeader from "../components/community/CommunityHeader";
+import CommunityControls from "../components/community/CommunityControls";
+import FilterPanel from "../components/filterPanel/FilterPanel";
+import RecipeList from "../components/global/RecipeList";
+import CreateRecipeModal from "../components/community/CreateRecipeModal";
+import "../styles/global/global.css";
 
-function Home() {
+function CommunityPage() {
   const [showFilters, setShowFilters] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
     diet: [],
@@ -15,8 +17,8 @@ function Home() {
     mood: [],
   });
   const [appliedFilters, setAppliedFilters] = useState({ ...filters });
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Debounce for live search
   useEffect(() => {
     const delay = setTimeout(() => {
       setAppliedFilters((prev) => ({
@@ -38,28 +40,23 @@ function Home() {
     setAppliedFilters(cleared);
   }
 
+  function handleRecipeCreated() {
+    setShowCreateModal(false);
+    setRefreshTrigger(prev => prev + 1);
+  }
+
   return (
     <>
       <Container fluid className="px-3 px-md-5">
-        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mb-4">
-          <div className="flex-grow-1 w-100">
-            <SearchBar
-              searchTerm={filters.search}
-              setSearchTerm={(val) =>
-                setFilters((prev) => ({ ...prev, search: val }))
-              }
-            />
-          </div>
-          <div className="text-end">
-            <button
-              className={`filter-button ${showFilters ? "active" : ""}`}
-              onClick={() => setShowFilters((prev) => !prev)}
-            >
-              <FiFilter className="filter-icon" />
-              Filter
-            </button>
-          </div>
-        </div>
+        <CommunityHeader />
+        
+        <CommunityControls
+          searchTerm={filters.search}
+          setSearchTerm={(val) => setFilters((prev) => ({ ...prev, search: val }))}
+          showFilters={showFilters}
+          onToggleFilters={() => setShowFilters((prev) => !prev)}
+          onCreateRecipe={() => setShowCreateModal(true)}
+        />
 
         <FilterPanel
           show={showFilters}
@@ -75,11 +72,19 @@ function Home() {
             diet={appliedFilters.diet}
             allergy={appliedFilters.allergy}
             mood={appliedFilters.mood}
+            isCommunityList={true}
+            refreshTrigger={refreshTrigger}
           />
         </div>
       </Container>
+
+      <CreateRecipeModal
+        show={showCreateModal}
+        onHide={() => setShowCreateModal(false)}
+        onSuccess={handleRecipeCreated}
+      />
     </>
   );
 }
 
-export default Home;
+export default CommunityPage;
