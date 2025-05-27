@@ -3,11 +3,11 @@ import axios from "axios";
 import { Row, Col, Spinner, Alert } from "react-bootstrap";
 import RecipeCard from "./RecipeCard";
 
-function RecipeList({ 
-  search, 
-  diet, 
-  allergy, 
-  mood, 
+function RecipeList({
+  search,
+  diet,
+  allergy,
+  mood,
   isCommunityList = false,
   refreshTrigger = 0
 }) {
@@ -54,27 +54,34 @@ function RecipeList({
       : recipesWithMood;
   }, [search, diet, allergy, mood, assignMood]);
 
+  // In RecipeList.jsx
   const fetchCommunityRecipes = useCallback(async (controller) => {
-    const response = await axios.get("/api/community", { signal: controller.signal });
+    const response = await axios.get("http://localhost:5000/api/community", {
+      signal: controller.signal
+    });
     let filteredRecipes = response.data;
 
+    // Apply client-side filtering
     if (search) {
       filteredRecipes = filteredRecipes.filter(recipe =>
         recipe.title.toLowerCase().includes(search.toLowerCase())
       );
     }
 
+    // Add mood assignment for community recipes
     filteredRecipes = filteredRecipes.map(r => ({
       ...r,
       mood: assignMood(r),
     }));
 
+    // Apply mood filter
     if (mood.length > 0) {
       filteredRecipes = filteredRecipes.filter(r => mood.includes(r.mood));
     }
 
     return filteredRecipes;
   }, [search, mood, assignMood]);
+
 
   useEffect(() => {
     const controller = new AbortController();
