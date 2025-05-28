@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Modal, Form, Button, Alert } from "react-bootstrap";
 import RecipeIngredientsList from "./RecipeIngredientsList";
 import RecipeInstructionsList from "./RecipeInstructionsList";
-import axios from "axios";
+import { communityAPI } from "../../services/api";
 
 function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
     const [formData, setFormData] = useState({
@@ -56,7 +56,6 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
             return;
         }
 
-        // In CreateRecipeForm.jsx handleSubmit function
         try {
             const submitData = new FormData();
             submitData.append("title", formData.title.trim());
@@ -67,12 +66,12 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
                 submitData.append("image", formData.image);
             }
 
-            // Use full URL to backend
-            await axios.post("http://localhost:5000/api/community", submitData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            console.log('🚀 Submitting recipe with authenticated API...');
+            
+            // Use the authenticated API service instead of direct axios
+            await communityAPI.createRecipe(submitData);
+
+            console.log('✅ Recipe submitted successfully!');
 
             // Reset form
             setFormData({
@@ -84,8 +83,13 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
 
             onSuccess();
         } catch (err) {
-            console.error("Error creating recipe:", err);
-            onError(err.response?.data?.details || "Failed to create recipe. Please try again.");
+            console.error("❌ Error creating recipe:", err);
+            
+            if (err.response?.status === 401) {
+                onError("Please log in again to create recipes.");
+            } else {
+                onError(err.response?.data?.details || err.response?.data?.error || "Failed to create recipe. Please try again.");
+            }
         } finally {
             setLoading(false);
         }

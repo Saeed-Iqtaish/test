@@ -1,4 +1,3 @@
-// src/components/global/Navbar.jsx
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -30,19 +29,15 @@ function AppNavbar() {
           <NavLink to="/" end className="nav-pill">
             Home
           </NavLink>
-          {isAuthenticated && (
-            <>
-              <NavLink to="/favorites" className="nav-pill">
-                Favorites
-              </NavLink>
-              <NavLink to="/community" className="nav-pill">
-                Community
-              </NavLink>
-              <NavLink to="/account" className="nav-pill">
-                Account
-              </NavLink>
-            </>
-          )}
+          <NavLink to="/favorites" className="nav-pill">
+            Favorites
+          </NavLink>
+          <NavLink to="/community" className="nav-pill">
+            Community
+          </NavLink>
+          <NavLink to="/account" className="nav-pill">
+            Account
+          </NavLink>
         </nav>
 
         <div className="auth-section d-flex align-items-center gap-3">

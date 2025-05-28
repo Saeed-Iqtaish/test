@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Container } from "react-bootstrap";
+import { Container, Alert } from "react-bootstrap";
+import { useAuth } from "../hooks/useAuth";
 import CommunityHeader from "../components/community/CommunityHeader";
 import CommunityControls from "../components/community/CommunityControls";
 import FilterPanel from "../components/filterPanel/FilterPanel";
 import RecipeList from "../components/global/RecipeList";
 import CreateRecipeModal from "../components/community/CreateRecipeModal";
+import LoginButton from "../components/auth/LoginButton";
 import "../styles/global/global.css";
 
 function CommunityPage() {
+  const { isAuthenticated } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
     diet: [],
@@ -40,9 +44,21 @@ function CommunityPage() {
     setAppliedFilters(cleared);
   }
 
+  function handleCreateRecipe() {
+    if (!isAuthenticated) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    setShowCreateModal(true);
+  }
+
   function handleRecipeCreated() {
     setShowCreateModal(false);
     setRefreshTrigger(prev => prev + 1);
+  }
+
+  function handleLoginPromptClose() {
+    setShowLoginPrompt(false);
   }
 
   return (
@@ -55,7 +71,7 @@ function CommunityPage() {
           setSearchTerm={(val) => setFilters((prev) => ({ ...prev, search: val }))}
           showFilters={showFilters}
           onToggleFilters={() => setShowFilters((prev) => !prev)}
-          onCreateRecipe={() => setShowCreateModal(true)}
+          onCreateRecipe={handleCreateRecipe}
         />
 
         <FilterPanel
@@ -78,11 +94,48 @@ function CommunityPage() {
         </div>
       </Container>
 
-      <CreateRecipeModal
-        show={showCreateModal}
-        onHide={() => setShowCreateModal(false)}
-        onSuccess={handleRecipeCreated}
-      />
+      {/* Login Prompt Modal */}
+      {showLoginPrompt && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Login Required</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={handleLoginPromptClose}
+                ></button>
+              </div>
+              <div className="modal-body text-center">
+                <h4 className="mb-3">Share Your Recipes!</h4>
+                <p className="mb-4">
+                  You need to be logged in to share your delicious recipes with the Mood Meals community.
+                </p>
+                <LoginButton />
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={handleLoginPromptClose}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Recipe Modal - Only show if authenticated */}
+      {isAuthenticated && (
+        <CreateRecipeModal
+          show={showCreateModal}
+          onHide={() => setShowCreateModal(false)}
+          onSuccess={handleRecipeCreated}
+        />
+      )}
     </>
   );
 }
