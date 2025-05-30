@@ -1,6 +1,5 @@
-// src/hooks/useAuth.js
 import { useAuth0 } from '@auth0/auth0-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { setAuthToken, userAPI } from '../services/api';
 
 export const useAuth = () => {
@@ -12,18 +11,29 @@ export const useAuth = () => {
     logout,
     getAccessTokenSilently
   } = useAuth0();
+  
+  const [userProfile, setUserProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
 
-  // Set up API token interceptor when authenticated
   useEffect(() => {
     if (isAuthenticated && getAccessTokenSilently) {
       setAuthToken(getAccessTokenSilently);
-      
-      // Create user profile on first login
-      userAPI.createProfile().catch(error => {
-        console.error('Error creating user profile:', error);
-      });
+      fetchUserProfile();
     }
   }, [isAuthenticated, getAccessTokenSilently]);
+
+  const fetchUserProfile = async () => {
+    setProfileLoading(true);
+    try {
+      await userAPI.createProfile();
+      const response = await userAPI.getProfile();
+      setUserProfile(response.data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const handleLogin = () => {
     loginWithRedirect();
@@ -39,10 +49,13 @@ export const useAuth = () => {
 
   return {
     user,
+    userProfile,
     isAuthenticated,
-    isLoading,
+    isLoading: isLoading || profileLoading,
+    isAdmin: userProfile?.isAdmin || false,
     login: handleLogin,
     logout: handleLogout,
-    getAccessTokenSilently
+    getAccessTokenSilently,
+    refreshProfile: fetchUserProfile
   };
 };

@@ -49,12 +49,14 @@ export const ratingsAPI = {
 export const communityAPI = {
   getRecipes: () => axios.get(`${API_BASE_URL}/community`),
   getRecipe: (id) => axios.get(`${API_BASE_URL}/community/${id}`),
+  getPendingRecipes: () => api.get('/community/admin/pending'),
   createRecipe: (formData) => api.post('/community', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   updateRecipe: (id, formData) => api.put(`/community/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
+  updateRecipeApproval: (id, approved) => api.patch(`/community/${id}/approval`, { approved }),
 };
 
 export default api;

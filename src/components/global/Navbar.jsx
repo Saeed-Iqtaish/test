@@ -7,7 +7,7 @@ import Profile from "../auth/Profile";
 import "../../styles/global/navbar.css";
 
 function AppNavbar() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isAdmin } = useAuth();
 
   if (isLoading) {
     return (
@@ -38,6 +38,11 @@ function AppNavbar() {
           <NavLink to="/account" className="nav-pill">
             Account
           </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin" className="nav-pill admin-link">
+              Admin
+            </NavLink>
+          )}
         </nav>
 
         <div className="auth-section d-flex align-items-center gap-3">

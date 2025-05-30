@@ -9,7 +9,8 @@ function RecipeList({
   allergy,
   mood,
   isCommunityList = false,
-  refreshTrigger = 0
+  refreshTrigger = 0,
+  onRecipeClick
 }) {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -54,7 +55,6 @@ function RecipeList({
       : recipesWithMood;
   }, [search, diet, allergy, mood, assignMood]);
 
-  // In RecipeList.jsx
   const fetchCommunityRecipes = useCallback(async (controller) => {
     const response = await axios.get("http://localhost:5000/api/community", {
       signal: controller.signal
@@ -81,7 +81,6 @@ function RecipeList({
 
     return filteredRecipes;
   }, [search, mood, assignMood]);
-
 
   useEffect(() => {
     const controller = new AbortController();
@@ -119,7 +118,11 @@ function RecipeList({
     <Row xs={1} sm={2} md={3} lg={4} className="g-4">
       {recipes.map((recipe) => (
         <Col key={recipe.id} className="d-flex">
-          <RecipeCard recipe={recipe} isCommunityRecipe={isCommunityList} />
+          <RecipeCard 
+            recipe={recipe} 
+            isCommunityRecipe={isCommunityList}
+            onClick={isCommunityList ? onRecipeClick : undefined}
+          />
         </Col>
       ))}
     </Row>
