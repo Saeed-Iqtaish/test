@@ -1,10 +1,44 @@
-import React from "react";
-import { Card, Badge } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Card, Badge, Button } from "react-bootstrap";
+import { FiEdit3, FiHeart } from "react-icons/fi";
 import MoodBadge from "./MoodBadge";
-import "../../styles/global/recipe-card.css";
+import RecipeNotesModal from "../favorites/RecipeNotesModal";
 import FavoriteButton from './FavoriteButton';
+import { notesAPI } from "../../services/api";
+import "../../styles/global/recipe-card.css";
 
-function RecipeCard({ recipe, isCommunityRecipe = false, onClick }) {
+function RecipeCard({ 
+  recipe, 
+  isCommunityRecipe = false, 
+  isFavoritesPage = false,
+  onClick,
+  onFavoriteChange 
+}) {
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [userNote, setUserNote] = useState("");
+
+  useEffect(() => {
+    if (isFavoritesPage) {
+      fetchUserNote();
+    }
+  }, [recipe.id, isFavoritesPage]);
+
+  const fetchUserNote = async () => {
+    try {
+      const response = await notesAPI.getNotes(recipe.id);
+      if (response.data.length > 0) {
+        setUserNote(response.data[0].note);
+      }
+    } catch (error) {
+      console.error("Error fetching note:", error);
+    }
+  };
+
+  const handleNoteSaved = (note) => {
+    setUserNote(note);
+    setShowNotesModal(false);
+  };
+
   const title = recipe.title;
   const image = isCommunityRecipe
     ? (recipe.image_data ? `/api/community/${recipe.id}/image` : null)
@@ -17,9 +51,16 @@ function RecipeCard({ recipe, isCommunityRecipe = false, onClick }) {
     ? (recipe.created_by_username || "Anonymous")
     : null;
 
-  const cardClass = isCommunityRecipe
-    ? "community-recipe-card flex-fill shadow-sm h-100"
-    : "flex-fill shadow-sm h-100";
+  const getCardClass = () => {
+    let baseClass = "flex-fill shadow-sm h-100";
+    if (isCommunityRecipe) {
+      baseClass = `community-recipe-card ${baseClass}`;
+    }
+    if (isFavoritesPage) {
+      baseClass = `favorite-recipe-card ${baseClass}`;
+    }
+    return baseClass;
+  };
 
   const handleClick = () => {
     if (onClick) {
@@ -28,78 +69,147 @@ function RecipeCard({ recipe, isCommunityRecipe = false, onClick }) {
   };
 
   return (
-    <Card
-      className={`${cardClass} ${onClick ? 'clickable-card' : ''}`}
-      onClick={handleClick}
-      style={{ cursor: onClick ? 'pointer' : 'default' }}
-    >
-      {image ? (
-        <Card.Img
-          variant="top"
-          src={image}
-          alt={title}
-          className="card-img-top"
-          style={{ objectFit: "cover", height: "200px" }}
-        />
-      ) : (
-        <div
-          className="d-flex align-items-center justify-content-center bg-light"
-          style={{ height: "200px" }}
-        >
-          <span className="text-muted">No Image Available</span>
-        </div>
-      )}
+    <>
+      <Card
+        className={`${getCardClass()} ${onClick ? 'clickable-card' : ''}`}
+        onClick={handleClick}
+        style={{ cursor: onClick ? 'pointer' : 'default' }}
+      >
+        {image ? (
+          <Card.Img
+            variant="top"
+            src={image}
+            alt={title}
+            className="card-img-top"
+            style={{ objectFit: "cover", height: "200px" }}
+          />
+        ) : (
+          <div
+            className="d-flex align-items-center justify-content-center bg-light"
+            style={{ height: "200px" }}
+          >
+            <span className="text-muted">No Image Available</span>
+          </div>
+        )}
 
-      <Card.Body className="d-flex flex-column">
-        <div className="d-flex justify-content-between mb-2 align-items-start">
-          <Card.Title as="h6" className="mb-0">
+        <Card.Body className="d-flex flex-column">
+          <div className="d-flex justify-content-between mb-2 align-items-start">
+            <MoodBadge mood={mood} />
+            {!isCommunityRecipe && (
+              <FavoriteButton 
+                recipeId={recipe.id} 
+                onFavoriteChange={onFavoriteChange}
+              />
+            )}
+          </div>
+
+          <Card.Title as="h6" className="recipe-title">
             {title}
           </Card.Title>
-          <MoodBadge mood={mood} />
-          {!isCommunityRecipe && (
-            <FavoriteButton recipeId={recipe.id} />
+
+          {/* Community Recipe Content */}
+          {isCommunityRecipe && (
+            <>
+              <Card.Text className="recipe-creator" style={{ fontSize: "0.85rem" }}>
+                <strong>Created by:</strong> {creatorName}
+              </Card.Text>
+
+              <div className="approval-status mb-2">
+                {recipe.approved ? (
+                  <Badge bg="success">✓ Approved</Badge>
+                ) : (
+                  <Badge bg="warning">⏳ Pending Approval</Badge>
+                )}
+              </div>
+
+              <div className="recipe-meta-info mt-auto">
+                <small className="recipe-date">
+                  Created: {new Date(recipe.created_at).toLocaleDateString()}
+                </small>
+              </div>
+            </>
           )}
-        </div>
 
-        {isCommunityRecipe ? (
-          <>
-            <Card.Text className="recipe-creator" style={{ fontSize: "0.85rem" }}>
-              <strong>Created by:</strong> {creatorName}
-            </Card.Text>
+          {/* Favorites Page Content */}
+          {isFavoritesPage && (
+            <>
+              <Card.Text className="recipe-description text-muted">
+                {recipe.summary ? 
+                  recipe.summary.replace(/<[^>]*>/g, '').substring(0, 100) + '...' : 
+                  'A delicious recipe to try!'
+                }
+              </Card.Text>
 
-            <div className="approval-status mb-2">
-              {recipe.approved ? (
-                <Badge bg="success">✓ Approved</Badge>
-              ) : (
-                <Badge bg="warning">⏳ Pending Approval</Badge>
-              )}
-            </div>
+              <Card.Text className="recipe-meta text-muted">
+                <strong>Prep Time:</strong> {prepTime} • <strong>Servings:</strong> {servings}
+              </Card.Text>
 
-            <div className="recipe-meta-info mt-auto">
-              <small className="recipe-date">
-                Created: {new Date(recipe.created_at).toLocaleDateString()}
-              </small>
-            </div>
-          </>
-        ) : (
-          <>
-            <Card.Text className="text-muted" style={{ fontSize: "0.85rem" }}>
-              Prep Time: {prepTime} &bull; Servings: {servings}
-            </Card.Text>
-
-            <div className="mt-2">
-              {recipe.diets?.map(function (diet) {
-                return (
-                  <Badge key={diet} bg="success" className="me-1">
+              <div className="mb-3">
+                {recipe.diets?.slice(0, 2).map((diet) => (
+                  <Badge key={diet} bg="success" className="me-1 mb-1">
                     {diet}
                   </Badge>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </Card.Body>
-    </Card>
+                ))}
+              </div>
+
+              <div className="notes-section mt-auto">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <h6 className="notes-title mb-0">Notes</h6>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="p-0 edit-note-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowNotesModal(true);
+                    }}
+                  >
+                    <FiEdit3 size={16} />
+                  </Button>
+                </div>
+                <div className="notes-content">
+                  {userNote ? (
+                    <p className="user-note">{userNote}</p>
+                  ) : (
+                    <p className="no-notes text-muted">Add notes</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Regular Recipe Content (Home page) */}
+          {!isCommunityRecipe && !isFavoritesPage && (
+            <>
+              <Card.Text className="text-muted" style={{ fontSize: "0.85rem" }}>
+                Prep Time: {prepTime} &bull; Servings: {servings}
+              </Card.Text>
+
+              <div className="mt-2">
+                {recipe.diets?.map(function (diet) {
+                  return (
+                    <Badge key={diet} bg="success" className="me-1">
+                      {diet}
+                    </Badge>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </Card.Body>
+      </Card>
+
+      {/* Notes Modal for Favorites Page */}
+      {isFavoritesPage && (
+        <RecipeNotesModal
+          show={showNotesModal}
+          onHide={() => setShowNotesModal(false)}
+          recipe={recipe}
+          currentNote={userNote}
+          onNoteSaved={handleNoteSaved}
+        />
+      )}
+    </>
   );
 }
 

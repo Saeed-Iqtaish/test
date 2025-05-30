@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Row, Col, Spinner, Alert } from "react-bootstrap";
 import RecipeCard from "./RecipeCard";
+import { favoritesAPI } from "../../services/api";
 
 function RecipeList({
   search,
@@ -9,6 +10,7 @@ function RecipeList({
   allergy,
   mood,
   isCommunityList = false,
+  isFavoritesPage = false,
   refreshTrigger = 0,
   onRecipeClick
 }) {
@@ -61,20 +63,17 @@ function RecipeList({
     });
     let filteredRecipes = response.data;
 
-    // Apply client-side filtering
     if (search) {
       filteredRecipes = filteredRecipes.filter(recipe =>
         recipe.title.toLowerCase().includes(search.toLowerCase())
       );
     }
 
-    // Add mood assignment for community recipes
     filteredRecipes = filteredRecipes.map(r => ({
       ...r,
       mood: assignMood(r),
     }));
 
-    // Apply mood filter
     if (mood.length > 0) {
       filteredRecipes = filteredRecipes.filter(r => mood.includes(r.mood));
     }
@@ -82,12 +81,85 @@ function RecipeList({
     return filteredRecipes;
   }, [search, mood, assignMood]);
 
+  const fetchFavoriteRecipes = useCallback(async (controller) => {
+    try {
+      const favoritesResponse = await favoritesAPI.getFavorites();
+      const favoriteIds = favoritesResponse.data.map(fav => fav.recipe_id);
+      
+      if (favoriteIds.length === 0) {
+        return [];
+      }
+
+      const recipePromises = favoriteIds.map(async (id) => {
+        try {
+          const response = await axios.get(`https://api.spoonacular.com/recipes/${id}/information`, {
+            signal: controller.signal,
+            params: {
+              apiKey: "68f91166a81747958d41b82fa5f038c9"
+            }
+          });
+          
+          return {
+            ...response.data,
+            mood: assignMood(response.data),
+            isFavorited: true
+          };
+        } catch (error) {
+          console.error(`Error fetching recipe ${id}:`, error);
+          return null;
+        }
+      });
+
+      const recipes = await Promise.all(recipePromises);
+      let validRecipes = recipes.filter(recipe => recipe !== null);
+
+      if (search) {
+        validRecipes = validRecipes.filter(recipe =>
+          recipe.title.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      if (diet.length > 0) {
+        validRecipes = validRecipes.filter(recipe => {
+          const recipeDiets = recipe.diets || [];
+          return diet.some(d => recipeDiets.includes(d));
+        });
+      }
+
+      if (mood.length > 0) {
+        validRecipes = validRecipes.filter(recipe => mood.includes(recipe.mood));
+      }
+
+      if (allergy.length > 0) {
+        validRecipes = validRecipes.filter(recipe => {
+          const recipeText = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
+          const hasAllergen = allergy.some(allergen => 
+            recipeText.includes(allergen.toLowerCase())
+          );
+          return !hasAllergen;
+        });
+      }
+
+      return validRecipes;
+    } catch (error) {
+      console.error("Error fetching favorite recipes:", error);
+      throw error;
+    }
+  }, [search, diet, allergy, mood, assignMood]);
+
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
     setError("");
 
-    const fetchFunction = isCommunityList ? fetchCommunityRecipes : fetchSpoonacularRecipes;
+    let fetchFunction;
+    if (isFavoritesPage) {
+      fetchFunction = fetchFavoriteRecipes;
+    } else if (isCommunityList) {
+      fetchFunction = fetchCommunityRecipes;
+    } else {
+      fetchFunction = fetchSpoonacularRecipes;
+    }
 
     fetchFunction(controller)
       .then(setRecipes)
@@ -108,11 +180,28 @@ function RecipeList({
       });
 
     return () => controller.abort();
-  }, [isCommunityList, fetchSpoonacularRecipes, fetchCommunityRecipes, refreshTrigger]);
+  }, [isFavoritesPage, isCommunityList, fetchSpoonacularRecipes, fetchCommunityRecipes, fetchFavoriteRecipes, refreshTrigger]);
+
+  const handleFavoriteChange = (recipeId, isFavorited) => {
+    if (isFavoritesPage && !isFavorited) {
+      setRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
+    }
+  };
 
   if (loading) return <Spinner animation="border" />;
   if (error) return <Alert variant="danger">{error}</Alert>;
-  if (!recipes.length) return <p>No recipes found.</p>;
+  
+  if (!recipes.length) {
+    if (isFavoritesPage) {
+      return (
+        <div className="text-center py-5">
+          <h4>No favorites yet!</h4>
+          <p className="text-muted">Start adding recipes to your favorites to see them here.</p>
+        </div>
+      );
+    }
+    return <p>No recipes found.</p>;
+  }
 
   return (
     <Row xs={1} sm={2} md={3} lg={4} className="g-4">
@@ -121,7 +210,9 @@ function RecipeList({
           <RecipeCard 
             recipe={recipe} 
             isCommunityRecipe={isCommunityList}
+            isFavoritesPage={isFavoritesPage}
             onClick={isCommunityList ? onRecipeClick : undefined}
+            onFavoriteChange={handleFavoriteChange}
           />
         </Col>
       ))}
