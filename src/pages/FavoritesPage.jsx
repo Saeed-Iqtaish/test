@@ -6,13 +6,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "../components/auth/AuthModal";
 import FavoritesHeader from "../components/favorites/FavoritesHeader";
 import SearchBar from "../components/global/SearchBar";
-import FilterPanel from "../components/filterPanel/FilterPanel";
+import FilterModal from "../components/filterPanel/FilterModal"; // Changed import
 import RecipeList from "../components/global/RecipeList";
 import RecipeDetails from "../components/global/RecipeDetails";
 import "../styles/global/global.css";
 
 function FavoritesPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth(); // Added user here
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -39,7 +39,6 @@ function FavoritesPage() {
 
   function handleApplyFilters() {
     setAppliedFilters({ ...filters });
-    setShowFilters(false);
   }
 
   function handleClearFilters() {
@@ -92,7 +91,7 @@ function FavoritesPage() {
           <div className="alert alert-info">
             <h4 className="alert-heading">Login Required</h4>
             <p className="mb-4">You need to be logged in to view your favorite recipes.</p>
-            <Button 
+            <Button
               variant="primary"
               onClick={() => setShowAuthModal(true)}
             >
@@ -114,16 +113,14 @@ function FavoritesPage() {
     <>
       <Container fluid className="px-3 px-md-5">
         <FavoritesHeader />
-        
-        {/* Search and Filter Controls - Same pattern as Home */}
-        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mb-4">
-          <div className="flex-grow-1 w-100">
+
+        {/* Search and Filter Controls - Moved to right */}
+        <div className="d-flex flex-column flex-md-row align-items-center justify-content-end gap-3 mb-4">
+          <div className="d-flex flex-column flex-md-row align-items-center gap-3">
             <SearchBar
               searchTerm={filters.search}
               setSearchTerm={(val) => setFilters((prev) => ({ ...prev, search: val }))}
             />
-          </div>
-          <div className="text-end">
             <button
               className={`filter-button ${showFilters ? "active" : ""}`}
               onClick={() => setShowFilters((prev) => !prev)}
@@ -133,14 +130,6 @@ function FavoritesPage() {
             </button>
           </div>
         </div>
-
-        <FilterPanel
-          show={showFilters}
-          filters={filters}
-          setFilters={setFilters}
-          onApply={handleApplyFilters}
-          onClear={handleClearFilters}
-        />
 
         <div className="mt-4">
           <RecipeList
@@ -163,6 +152,17 @@ function FavoritesPage() {
         isCommunityRecipe={selectedRecipe?.isCommunityRecipe || false}
         onFavoriteChange={handleFavoriteChange}
         onViewFullRecipe={handleViewFullRecipe}
+      />
+
+      {/* Filter Modal */}
+      <FilterModal
+        show={showFilters}
+        onHide={() => setShowFilters(false)}
+        filters={filters}
+        setFilters={setFilters}
+        onApply={handleApplyFilters}
+        onClear={handleClearFilters}
+        userAllergies={user?.allergies || []}
       />
     </>
   );

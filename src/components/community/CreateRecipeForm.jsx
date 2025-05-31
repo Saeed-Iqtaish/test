@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Button, Alert } from "react-bootstrap";
+import { Modal, Form, Button, Alert, Row, Col } from "react-bootstrap";
 import RecipeIngredientsList from "./RecipeIngredientsList";
 import RecipeInstructionsList from "./RecipeInstructionsList";
 import { communityAPI } from "../../services/api";
@@ -7,6 +7,8 @@ import { communityAPI } from "../../services/api";
 function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
     const [formData, setFormData] = useState({
         title: "",
+        prepTime: "",
+        servings: "",
         image: null,
         ingredients: [""],
         instructions: [""]
@@ -35,8 +37,21 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
         e.preventDefault();
         setLoading(true);
 
+        // Validation
         if (!formData.title.trim()) {
             onError("Recipe title is required");
+            setLoading(false);
+            return;
+        }
+
+        if (!formData.prepTime || formData.prepTime <= 0) {
+            onError("Valid prep time is required");
+            setLoading(false);
+            return;
+        }
+
+        if (!formData.servings || formData.servings <= 0) {
+            onError("Valid number of servings is required");
             setLoading(false);
             return;
         }
@@ -59,6 +74,8 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
         try {
             const submitData = new FormData();
             submitData.append("title", formData.title.trim());
+            submitData.append("prep_time", parseInt(formData.prepTime));
+            submitData.append("servings", parseInt(formData.servings));
             submitData.append("ingredients", JSON.stringify(validIngredients));
             submitData.append("instructions", JSON.stringify(validInstructions));
 
@@ -68,7 +85,6 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
 
             console.log('🚀 Submitting recipe with authenticated API...');
             
-            // Use the authenticated API service instead of direct axios
             await communityAPI.createRecipe(submitData);
 
             console.log('✅ Recipe submitted successfully!');
@@ -76,6 +92,8 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
             // Reset form
             setFormData({
                 title: "",
+                prepTime: "",
+                servings: "",
                 image: null,
                 ingredients: [""],
                 instructions: [""]
@@ -111,6 +129,45 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
                         required
                     />
                 </Form.Group>
+
+                <Row className="mb-3">
+                    <Col md={6}>
+                        <Form.Group>
+                            <Form.Label>Prep Time (minutes) *</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="prepTime"
+                                value={formData.prepTime}
+                                onChange={handleInputChange}
+                                placeholder="e.g., 30"
+                                min="1"
+                                max="1440"
+                                required
+                            />
+                            <Form.Text className="text-muted">
+                                Total preparation and cooking time in minutes
+                            </Form.Text>
+                        </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                        <Form.Group>
+                            <Form.Label>Servings *</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="servings"
+                                value={formData.servings}
+                                onChange={handleInputChange}
+                                placeholder="e.g., 4"
+                                min="1"
+                                max="50"
+                                required
+                            />
+                            <Form.Text className="text-muted">
+                                Number of people this recipe serves
+                            </Form.Text>
+                        </Form.Group>
+                    </Col>
+                </Row>
 
                 <Form.Group className="mb-3">
                     <Form.Label>Recipe Image</Form.Label>

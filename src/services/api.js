@@ -45,6 +45,7 @@ export const userAPI = {
   getProfile: () => api.get('/users/me'),
   updateProfile: (data) => api.put('/users/me', data),
   getAllUsers: () => api.get('/users'),
+  getMyRecipes: () => api.get('/users/my-recipes'),
 };
 
 export const favoritesAPI = {
@@ -92,6 +93,7 @@ export const communityAPI = {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   updateRecipeApproval: (id, approved) => api.patch(`/community/${id}/approval`, { approved }),
+  deleteRecipe: (id) => api.delete(`/community/${id}`),
 };
 
 export default api;

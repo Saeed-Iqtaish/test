@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, userAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -28,7 +28,8 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      const response = await authAPI.getMe();
+      // Use userAPI.getProfile to get complete user data including allergies
+      const response = await userAPI.getProfile();
       setUser(response.data);
       setIsAuthenticated(true);
     } catch (error) {
@@ -44,18 +45,21 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await authAPI.login(email, password);
-      const { token, user } = response.data;
-      
+      const { token } = response.data;
+
       localStorage.setItem('token', token);
-      setUser(user);
+
+      // Fetch complete user profile after login
+      const profileResponse = await userAPI.getProfile();
+      setUser(profileResponse.data);
       setIsAuthenticated(true);
-      
+
       return { success: true };
     } catch (error) {
       console.error('Login failed:', error);
-      return { 
-        success: false, 
-        error: error.response?.data?.details || error.response?.data?.error || 'Login failed' 
+      return {
+        success: false,
+        error: error.response?.data?.details || error.response?.data?.error || 'Login failed'
       };
     }
   };
@@ -63,18 +67,21 @@ export const AuthProvider = ({ children }) => {
   const signup = async (username, email, password) => {
     try {
       const response = await authAPI.signup(username, email, password);
-      const { token, user } = response.data;
-      
+      const { token } = response.data;
+
       localStorage.setItem('token', token);
-      setUser(user);
+
+      // Fetch complete user profile after signup
+      const profileResponse = await userAPI.getProfile();
+      setUser(profileResponse.data);
       setIsAuthenticated(true);
-      
+
       return { success: true };
     } catch (error) {
       console.error('Signup failed:', error);
-      return { 
-        success: false, 
-        error: error.response?.data?.details || error.response?.data?.error || 'Signup failed' 
+      return {
+        success: false,
+        error: error.response?.data?.details || error.response?.data?.error || 'Signup failed'
       };
     }
   };
@@ -85,6 +92,10 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  const refreshProfile = async () => {
+    return checkAuthStatus();
+  };
+
   const value = {
     user,
     isAuthenticated,
@@ -93,7 +104,7 @@ export const AuthProvider = ({ children }) => {
     login,
     signup,
     logout,
-    refreshProfile: checkAuthStatus
+    refreshProfile
   };
 
   return (

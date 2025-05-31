@@ -54,11 +54,12 @@ function RecipeCard({
   };
 
   const title = recipe.title;
+  // Fixed: More robust API URL construction with fallback
   const image = isActuallyCommunityRecipe
-    ? (recipe.image_data ? `${process.env.REACT_APP_API_URL}/community/${recipe.id}/image` : null)
+    ? (recipe.image_data ? `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image` : null)
     : recipe.image;
-  const prepTime = isActuallyCommunityRecipe ? "N/A" : `${recipe.readyInMinutes} mins`;
-  const servings = isActuallyCommunityRecipe ? "N/A" : recipe.servings;
+  const prepTime = isActuallyCommunityRecipe ? `${recipe.prep_time || 'N/A'} mins` : `${recipe.readyInMinutes} mins`;
+  const servings = isActuallyCommunityRecipe ? recipe.servings || 'N/A' : recipe.servings;
   const mood = recipe.mood || "Happy";
 
   const creatorName = isActuallyCommunityRecipe
@@ -109,6 +110,11 @@ function RecipeCard({
             alt={title}
             className="card-img-top"
             style={{ objectFit: "cover", height: "200px" }}
+            onError={(e) => {
+              console.error('Error loading recipe card image:', e.target.src);
+              // Hide the image on error but keep the placeholder
+              e.target.style.display = 'none';
+            }}
           />
         ) : (
           <div
@@ -123,12 +129,14 @@ function RecipeCard({
           <div className="d-flex justify-content-between mb-2 align-items-start">
             <MoodBadge mood={mood} />
             {showFavoriteButton() && (
-              <FavoriteButton 
-                recipeId={recipe.id}
-                isCommunityRecipe={isActuallyCommunityRecipe}
-                onFavoriteChange={onFavoriteChange}
-                onLoginRequired={handleLoginRequired}
-              />
+              <div onClick={(e) => e.stopPropagation()}>
+                <FavoriteButton 
+                  recipeId={recipe.id}
+                  isCommunityRecipe={isActuallyCommunityRecipe}
+                  onFavoriteChange={onFavoriteChange}
+                  onLoginRequired={handleLoginRequired}
+                />
+              </div>
             )}
           </div>
 
@@ -139,40 +147,22 @@ function RecipeCard({
           {/* Community Recipe Content */}
           {isActuallyCommunityRecipe && !isFavoritesPage && (
             <>
-              <Card.Text className="recipe-creator" style={{ fontSize: "0.85rem" }}>
-                <strong>Created by:</strong>{" "}
-                <span 
-                  className={recipe.created_by_username === "Anonymous" ? "text-muted" : ""}
-                  style={{ 
-                    fontStyle: recipe.created_by_username === "Anonymous" ? "italic" : "normal" 
-                  }}
-                >
-                  {creatorName}
-                </span>
-                {recipe.created_by_username === "Anonymous" && (
-                  <small className="text-muted d-block">
-                    (Account no longer active)
-                  </small>
-                )}
+              <Card.Text className="text-muted" style={{ fontSize: "0.85rem" }}>
+                Prep Time: {prepTime} &bull; Servings: {servings}
               </Card.Text>
 
-              <div className="approval-status mb-2">
-                {recipe.approved ? (
-                  <Badge bg="success">✓ Approved</Badge>
-                ) : (
-                  <Badge bg="warning">⏳ Pending Approval</Badge>
-                )}
-              </div>
-
               <div className="recipe-meta-info mt-auto">
-                <small className="recipe-date">
-                  Created: {new Date(recipe.created_at).toLocaleDateString()}
+                <small className="recipe-creator">
+                  <strong>By:</strong>{" "}
+                  <span 
+                    className={recipe.created_by_username === "Anonymous" ? "text-muted" : ""}
+                    style={{ 
+                      fontStyle: recipe.created_by_username === "Anonymous" ? "italic" : "normal" 
+                    }}
+                  >
+                    {creatorName}
+                  </span>
                 </small>
-                {isClickable() && (
-                  <small className="d-block text-primary mt-1">
-                    Click to preview →
-                  </small>
-                )}
               </div>
             </>
           )}
@@ -251,12 +241,6 @@ function RecipeCard({
                   );
                 })}
               </div>
-
-              {isClickable() && (
-                <small className="text-primary mt-2">
-                  Click to view details →
-                </small>
-              )}
             </>
           )}
         </Card.Body>

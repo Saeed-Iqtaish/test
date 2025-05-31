@@ -1,25 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Container } from "react-bootstrap";
 import { FiFilter } from "react-icons/fi";
 import SearchBar from "./components/global/SearchBar";
-import FilterPanel from "./components/filterPanel/FilterPanel";
+import FilterModal from "./components/filterPanel/FilterModal";
 import RecipeList from "./components/global/RecipeList";
 import RecipeDetails from "./components/global/RecipeDetails";
+import HomeHeader from "./components/home/HomeHeader";
 import { AuthModal } from "./components/auth/AuthModal";
+import { useAuth } from "./contexts/AuthContext";
 import "./styles/global/global.css"
 
 function Home() {
-  const [showFilters, setShowFilters] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [filters, setFilters] = useState({
+  
+  // Initialize filters with user allergies if logged in - use useCallback to memoize
+  const getInitialFilters = useCallback(() => ({
     search: "",
     diet: [],
-    allergy: [],
+    allergy: isAuthenticated && user?.allergies ? [...user.allergies] : [],
     mood: [],
-  });
-  const [appliedFilters, setAppliedFilters] = useState({ ...filters });
+  }), [isAuthenticated, user?.allergies]);
+
+  const [filters, setFilters] = useState(getInitialFilters());
+  const [appliedFilters, setAppliedFilters] = useState(getInitialFilters());
   const [showRecipeDetails, setShowRecipeDetails] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+
+  // Update filters when user auth state changes
+  useEffect(() => {
+    const newFilters = getInitialFilters();
+    setFilters(newFilters);
+    setAppliedFilters(newFilters);
+  }, [getInitialFilters]);
 
   // Debounce for live search
   useEffect(() => {
@@ -34,13 +48,18 @@ function Home() {
 
   function handleApplyFilters() {
     setAppliedFilters({ ...filters });
-    setShowFilters(false);
   }
 
   function handleClearFilters() {
-    const cleared = { search: "", diet: [], allergy: [], mood: [] };
-    setFilters(cleared);
-    setAppliedFilters(cleared);
+    // When clearing, keep user allergies but clear everything else
+    const clearedFilters = {
+      search: "",
+      diet: [],
+      allergy: isAuthenticated && user?.allergies ? [...user.allergies] : [],
+      mood: []
+    };
+    setFilters(clearedFilters);
+    setAppliedFilters(clearedFilters);
   }
 
   function handleRecipeClick(recipe) {
@@ -65,36 +84,41 @@ function Home() {
     setShowAuthModal(false);
   }
 
+  // Calculate active filter count for display
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (filters.mood.length > 0) count += filters.mood.length;
+    if (filters.diet.length > 0) count += filters.diet.length;
+    if (filters.allergy.length > 0) count += filters.allergy.length;
+    return count;
+  };
+
   return (
     <>
       <Container fluid className="px-3 px-md-5">
-        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mb-4">
-          <div className="flex-grow-1 w-100">
+        <HomeHeader />
+        
+        <div className="d-flex flex-column flex-md-row align-items-center justify-content-end gap-3 mb-4">
+          <div className="d-flex flex-column flex-md-row align-items-center gap-3">
             <SearchBar
               searchTerm={filters.search}
               setSearchTerm={(val) =>
                 setFilters((prev) => ({ ...prev, search: val }))
               }
             />
-          </div>
-          <div className="text-end">
             <button
-              className={`filter-button ${showFilters ? "active" : ""}`}
-              onClick={() => setShowFilters((prev) => !prev)}
+              className={`filter-button ${showFilterModal ? "active" : ""}`}
+              onClick={() => setShowFilterModal(true)}
             >
               <FiFilter className="filter-icon" />
               Filter
+              {/* Show count of active filters */}
+              {getActiveFilterCount() > 0 && (
+                <span className="badge bg-primary ms-2">{getActiveFilterCount()}</span>
+              )}
             </button>
           </div>
         </div>
-
-        <FilterPanel
-          show={showFilters}
-          filters={filters}
-          setFilters={setFilters}
-          onApply={handleApplyFilters}
-          onClear={handleClearFilters}
-        />
 
         <div className="mt-4">
           <RecipeList
@@ -105,6 +129,7 @@ function Home() {
             onRecipeClick={handleRecipeClick}
             onFavoriteChange={handleFavoriteChange}
             onLoginRequired={handleLoginRequired}
+            enableInfiniteScroll={true} // Enable infinite scrolling for home page
           />
         </div>
 
@@ -116,6 +141,17 @@ function Home() {
           onFavoriteChange={handleFavoriteChange}
         />
       </Container>
+
+      {/* Filter Modal */}
+      <FilterModal
+        show={showFilterModal}
+        onHide={() => setShowFilterModal(false)}
+        filters={filters}
+        setFilters={setFilters}
+        onApply={handleApplyFilters}
+        onClear={handleClearFilters}
+        userAllergies={user?.allergies || []}
+      />
 
       {/* Auth Modal for login prompts */}
       <AuthModal

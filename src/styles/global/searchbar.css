@@ -2,7 +2,7 @@
 .search-container {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 300px; /* Made slightly smaller to fit better with filter button */
 }
 
 .search-icon {
@@ -43,6 +43,7 @@
 @media (max-width: 768px) {
   .search-container {
     max-width: 100%;
+    width: 250px; /* Fixed width on mobile for better layout */
   }
   
   .search-input {

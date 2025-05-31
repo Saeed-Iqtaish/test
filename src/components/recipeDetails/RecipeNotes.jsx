@@ -4,7 +4,7 @@ import { FiEdit3, FiSave, FiX } from "react-icons/fi";
 import { notesAPI } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 
-function RecipeNotes({ recipe }) {
+function RecipeNotes({ recipe, isCommunityRecipe = false }) {
   const { isAuthenticated } = useAuth();
   const [userNote, setUserNote] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -68,28 +68,14 @@ function RecipeNotes({ recipe }) {
 
   if (!isAuthenticated) {
     return (
-      <div className="text-center p-4">
-        <p className="text-muted">Log in to add personal notes to this recipe.</p>
+      <div className="text-center p-3 bg-light rounded">
+        <p className="text-muted mb-0 small">Log in to add personal notes</p>
       </div>
     );
   }
 
   return (
-    <div className="recipe-notes-section">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h6>Personal Notes</h6>
-        {!isEditing && (
-          <Button 
-            variant="outline-primary" 
-            size="sm" 
-            onClick={handleEdit}
-          >
-            <FiEdit3 className="me-1" />
-            {userNote ? 'Edit' : 'Add'} Notes
-          </Button>
-        )}
-      </div>
-
+    <div className="recipe-notes-sidebar">
       {isEditing ? (
         <div>
           <Form.Group className="mb-3">
@@ -98,49 +84,77 @@ function RecipeNotes({ recipe }) {
               rows={4}
               value={tempNote}
               onChange={(e) => setTempNote(e.target.value)}
-              placeholder="Add your cooking notes, tips, or modifications here..."
+              placeholder="Add notes"
+              className="border rounded"
+              style={{ fontSize: '0.9rem' }}
             />
           </Form.Group>
-          <div className="d-flex gap-2">
+          <div className="d-flex gap-2 flex-wrap">
             <Button 
               variant="success" 
               size="sm" 
               onClick={handleSave}
               disabled={loading}
+              className="flex-fill"
             >
               <FiSave className="me-1" />
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? 'Saving...' : 'Save Notes'}
             </Button>
             <Button 
               variant="secondary" 
               size="sm" 
               onClick={handleCancel}
               disabled={loading}
+              className="flex-fill"
             >
               <FiX className="me-1" />
               Cancel
             </Button>
-            {userNote && (
-              <Button 
-                variant="outline-danger" 
-                size="sm" 
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                Delete
-              </Button>
-            )}
           </div>
+          {userNote && (
+            <Button 
+              variant="outline-danger" 
+              size="sm" 
+              onClick={handleDelete}
+              disabled={loading}
+              className="w-100 mt-2"
+            >
+              Delete Note
+            </Button>
+          )}
         </div>
       ) : (
-        <div className="notes-content">
+        <div className="notes-display">
           {userNote ? (
-            <div className="user-note p-3 bg-light rounded">
-              <p className="mb-0">{userNote}</p>
+            <div className="user-note-display p-3 bg-light rounded position-relative">
+              <p className="mb-0" style={{ fontSize: '0.9rem', lineHeight: '1.4' }}>
+                {userNote}
+              </p>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={handleEdit}
+                className="position-absolute top-0 end-0 p-1 text-muted"
+                style={{ fontSize: '0.8rem' }}
+              >
+                <FiEdit3 size={14} />
+              </Button>
             </div>
           ) : (
-            <div className="text-center p-4">
-              <p className="text-muted">No notes added yet. Click "Add Notes" to get started!</p>
+            <div 
+              className="no-notes-placeholder p-3 bg-light rounded text-center cursor-pointer"
+              onClick={handleEdit}
+              style={{ cursor: 'pointer' }}
+            >
+              <p className="text-muted mb-2 small">Add notes</p>
+              <Button 
+                variant="outline-primary" 
+                size="sm"
+                onClick={handleEdit}
+              >
+                <FiEdit3 className="me-1" />
+                Add Notes
+              </Button>
             </div>
           )}
         </div>

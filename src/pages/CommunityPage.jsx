@@ -5,14 +5,14 @@ import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "../components/auth/AuthModal";
 import CommunityHeader from "../components/community/CommunityHeader";
 import CommunityControls from "../components/community/CommunityControls";
-import FilterPanel from "../components/filterPanel/FilterPanel";
+import FilterModal from "../components/filterPanel/FilterModal"; // Changed import
 import RecipeList from "../components/global/RecipeList";
 import RecipeDetails from "../components/global/RecipeDetails";
 import CreateRecipeModal from "../components/community/CreateRecipeModal";
 import "../styles/global/global.css";
 
 function CommunityPage() {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth(); // Added user here
   const navigate = useNavigate();
   
   const [showFilters, setShowFilters] = useState(false);
@@ -42,7 +42,6 @@ function CommunityPage() {
 
   function handleApplyFilters() {
     setAppliedFilters({ ...filters });
-    setShowFilters(false);
   }
 
   function handleClearFilters() {
@@ -103,14 +102,6 @@ function CommunityPage() {
           onCreateRecipe={handleCreateRecipe}
         />
 
-        <FilterPanel
-          show={showFilters}
-          filters={filters}
-          setFilters={setFilters}
-          onApply={handleApplyFilters}
-          onClear={handleClearFilters}
-        />
-
         <div className="mt-4">
           <RecipeList
             search={appliedFilters.search}
@@ -133,6 +124,17 @@ function CommunityPage() {
         isCommunityRecipe={true}
         onFavoriteChange={handleFavoriteChange}
         onViewFullRecipe={handleViewFullRecipe}
+      />
+
+      {/* Filter Modal */}
+      <FilterModal
+        show={showFilters}
+        onHide={() => setShowFilters(false)}
+        filters={filters}
+        setFilters={setFilters}
+        onApply={handleApplyFilters}
+        onClear={handleClearFilters}
+        userAllergies={user?.allergies || []}
       />
 
       <AuthModal

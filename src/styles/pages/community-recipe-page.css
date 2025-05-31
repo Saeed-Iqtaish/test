@@ -1,0 +1,508 @@
+/* Recipe Details Page CSS - Improved UX & Aesthetics */
+.recipe-details-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Back Button */
+.recipe-details-page .btn-outline-primary {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 25px;
+  border: 2px solid #007bff;
+  transition: all 0.2s ease;
+}
+
+.recipe-details-page .btn-outline-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Recipe Header Section */
+.recipe-header-section {
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #E9ECEF;
+}
+
+.recipe-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2E2E2E;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.recipe-meta {
+  color: #6C757D;
+  font-size: 1.1rem;
+  margin-top: 0.75rem;
+}
+
+.recipe-meta .meta-item {
+  margin: 0;
+}
+
+.recipe-meta strong {
+  color: #495057;
+  font-weight: 600;
+}
+
+/* Favorite Button in Header */
+.recipe-header-section .favorite-btn {
+  padding: 0.5rem !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 2px solid transparent !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.recipe-header-section .favorite-btn:hover {
+  background: rgba(255, 107, 107, 0.1) !important;
+  border-color: rgba(255, 107, 107, 0.2) !important;
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.2) !important;
+}
+
+.recipe-header-section .heart-icon {
+  font-size: 1.5rem !important;
+}
+
+/* Left Column - Image and Notes */
+.recipe-left-column {
+  padding-right: 3rem;
+}
+
+.recipe-image-container {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+.recipe-image {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease;
+}
+
+.recipe-image:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Personal Notes Section */
+.personal-notes-section {
+  margin-top: 2.5rem;
+}
+
+.notes-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2E2E2E;
+  margin-bottom: 1.25rem;
+}
+
+.notes-display {
+  background: #F8F9FA;
+  border: 2px solid #E9ECEF;
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-height: 150px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.notes-display:hover {
+  border-color: #FF6B6B;
+  background: #FFF8F8;
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.1);
+}
+
+.user-note {
+  color: #495057;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.add-notes-placeholder {
+  color: #9CA3AF;
+  font-size: 1rem;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  border: 2px dashed #D1D5DB;
+  border-radius: 8px;
+  background: transparent;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.add-notes-placeholder::before {
+  content: "✏️";
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.notes-display:hover .add-notes-placeholder {
+  border-color: #FF6B6B;
+  color: #FF6B6B;
+  background: rgba(255, 107, 107, 0.02);
+}
+
+.notes-edit-form .notes-textarea {
+  border: 2px solid #E9ECEF;
+  border-radius: 12px;
+  padding: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 150px;
+  transition: border-color 0.2s ease;
+}
+
+.notes-edit-form .notes-textarea:focus {
+  border-color: #FF6B6B;
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+}
+
+.save-notes-btn {
+  background-color: #FF6B6B !important;
+  border-color: #FF6B6B !important;
+  color: white !important;
+  border-radius: 25px !important;
+  padding: 0.75rem 2rem !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.save-notes-btn:hover {
+  background-color: #FF5252 !important;
+  border-color: #FF5252 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+}
+
+.save-notes-btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25) !important;
+}
+
+/* Right Column - Content Tabs */
+.recipe-content-column {
+  padding-left: 3rem;
+  border-left: 2px solid #E9ECEF;
+}
+
+.recipe-tabs {
+  margin-bottom: 0;
+}
+
+.recipe-tabs .nav-tabs {
+  border-bottom: 3px solid #E9ECEF;
+  margin-bottom: 2.5rem;
+}
+
+.recipe-tabs .nav-link {
+  border: none !important;
+  border-radius: 0 !important;
+  border-bottom: 4px solid transparent !important;
+  padding: 1.25rem 2rem !important;
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  color: #9CA3AF !important;
+  background: none !important;
+  transition: all 0.3s ease !important;
+  position: relative;
+}
+
+.recipe-tabs .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  width: 0;
+  height: 4px;
+  background: #FF6B6B;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.recipe-tabs .nav-link:hover {
+  color: #FF6B6B !important;
+  background: rgba(255, 107, 107, 0.05) !important;
+}
+
+.recipe-tabs .nav-link:hover::after {
+  width: 80%;
+}
+
+.recipe-tabs .nav-link.active {
+  color: #2E2E2E !important;
+  font-weight: 700 !important;
+  background: none !important;
+}
+
+.recipe-tabs .nav-link.active::after {
+  width: 100%;
+}
+
+.tab-content-area {
+  padding: 0;
+}
+
+/* Ingredients and Instructions Styling */
+.ingredients-section h6,
+.instructions-section h6 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2E2E2E;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ingredients-section h6::before {
+  content: "🥕";
+  font-size: 1.2rem;
+}
+
+.instructions-section h6::before {
+  content: "👨‍🍳";
+  font-size: 1.2rem;
+}
+
+.ingredients-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredient-item {
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+  border: 2px solid #E9ECEF;
+  border-left: 5px solid #FF6B6B;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: #495057;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.ingredient-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.1);
+  border-color: #FF6B6B;
+}
+
+.instructions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.instruction-step {
+  background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+  border: 2px solid #E9ECEF;
+  border-left: 5px solid #28A745;
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.instruction-step:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(40, 167, 69, 0.1);
+  border-color: #28A745;
+}
+
+.instruction-step strong {
+  display: block;
+  color: #28A745;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.instruction-step strong::before {
+  content: counter(step-counter);
+  counter-increment: step-counter;
+  background: #28A745;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.instructions-list {
+  counter-reset: step-counter;
+}
+
+.instruction-step p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #495057;
+}
+
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .recipe-details-page {
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+  
+  .recipe-left-column {
+    padding-right: 2rem;
+  }
+  
+  .recipe-content-column {
+    padding-left: 2rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .recipe-left-column {
+    padding-right: 1rem;
+    margin-bottom: 3rem;
+  }
+  
+  .recipe-content-column {
+    padding-left: 1rem;
+    border-left: none;
+    border-top: 2px solid #E9ECEF;
+    padding-top: 3rem;
+  }
+  
+  .recipe-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .recipe-details-page {
+    padding: 1rem;
+  }
+  
+  .recipe-title {
+    font-size: 1.8rem;
+  }
+  
+  .recipe-left-column,
+  .recipe-content-column {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .recipe-tabs .nav-link {
+    padding: 1rem 1.5rem !important;
+    font-size: 1.1rem !important;
+  }
+  
+  .personal-notes-section {
+    margin-top: 2rem;
+  }
+  
+  .recipe-image {
+    height: 280px;
+  }
+}
+
+@media (max-width: 576px) {
+  .recipe-header-section .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+  
+  .recipe-title {
+    font-size: 1.6rem;
+  }
+  
+  .recipe-tabs .nav-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .recipe-tabs .nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .recipe-tabs .nav-link {
+    white-space: nowrap;
+    min-width: 140px;
+    padding: 0.875rem 1.25rem !important;
+  }
+  
+  .ingredient-item,
+  .instruction-step {
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+  }
+}
+
+/* Loading and Animation States */
+.recipe-image,
+.ingredient-item,
+.instruction-step,
+.notes-display {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accessibility Improvements */
+.recipe-tabs .nav-link:focus {
+  outline: 2px solid #FF6B6B;
+  outline-offset: 2px;
+}
+
+.notes-display:focus {
+  outline: 2px solid #FF6B6B;
+  outline-offset: 2px;
+}
+
+/* Enhanced Visual Hierarchy */
+.recipe-header-section {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}

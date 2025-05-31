@@ -3,34 +3,40 @@
   margin-bottom: 2rem;
 }
 
-.community-controls .btn-success {
+.create-recipe-btn {
   background-color: #28a745 !important;
   border-color: #28a745 !important;
   border-radius: 25px !important;
   padding: 0.6rem 1.5rem !important;
   font-weight: 600 !important;
   font-size: 0.95rem !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
   transition: all 0.2s ease !important;
   border: none !important;
 }
 
-.community-controls .btn-success:hover {
+.create-recipe-btn:hover {
   background-color: #218838 !important;
   border-color: #1e7e34 !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
 }
 
-.community-controls .btn-success:focus {
+.create-recipe-btn:focus {
   box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
 }
 
 @media (max-width: 768px) {
-  .community-controls .btn-success {
+  .create-recipe-btn {
     width: 100%;
     justify-content: center;
+  }
+  
+  .community-controls .d-flex {
+    width: 100%;
+  }
+  
+  .community-controls .d-flex:first-child {
+    justify-content: center;
+    margin-bottom: 1rem;
   }
 }

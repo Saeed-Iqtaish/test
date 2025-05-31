@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { Row, Col, Spinner, Alert } from "react-bootstrap";
+import { Row, Col, Spinner, Alert, Button } from "react-bootstrap";
 import RecipeCard from "./RecipeCard";
 import { favoritesAPI } from "../../services/api";
 
@@ -13,11 +13,17 @@ function RecipeList({
   isFavoritesPage = false,
   refreshTrigger = 0,
   onRecipeClick,
-  onFavoriteChange
+  onFavoriteChange,
+  enableInfiniteScroll = false // New prop for infinite scrolling
 }) {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  
+  const RECIPES_PER_PAGE = 12;
 
   const assignMood = useCallback((recipe) => {
     const text = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
@@ -35,12 +41,13 @@ function RecipeList({
     return "Happy";
   }, []);
 
-  const fetchSpoonacularRecipes = useCallback(async (controller) => {
+  const fetchSpoonacularRecipes = useCallback(async (controller, offset = 0, limit = RECIPES_PER_PAGE) => {
     const response = await axios.get("https://api.spoonacular.com/recipes/complexSearch", {
       signal: controller.signal,
       params: {
         apiKey: process.env.REACT_APP_SPOONACULAR_API_KEY,
-        number: 12,
+        number: limit,
+        offset: offset,
         addRecipeInformation: true,
         query: search || "",
         diet: diet.length > 0 ? diet[0].toLowerCase() : undefined,
@@ -53,9 +60,14 @@ function RecipeList({
       mood: assignMood(r),
     }));
 
-    return mood.length > 0
+    const filteredRecipes = mood.length > 0
       ? recipesWithMood.filter((r) => mood.includes(r.mood))
       : recipesWithMood;
+
+    return {
+      recipes: filteredRecipes,
+      totalResults: response.data.totalResults
+    };
   }, [search, diet, allergy, mood, assignMood]);
 
   const fetchCommunityRecipes = useCallback(async (controller) => {
@@ -79,10 +91,8 @@ function RecipeList({
       filteredRecipes = filteredRecipes.filter(r => mood.includes(r.mood));
     }
 
-    return filteredRecipes;
+    return { recipes: filteredRecipes, totalResults: filteredRecipes.length };
   }, [search, mood, assignMood]);
-
-  // Update the fetchFavoriteRecipes function in RecipeList.jsx
 
   const fetchFavoriteRecipes = useCallback(async (controller) => {
     try {
@@ -90,7 +100,7 @@ function RecipeList({
       const favorites = favoritesResponse.data;
 
       if (favorites.length === 0) {
-        return [];
+        return { recipes: [], totalResults: 0 };
       }
 
       // Separate favorites by type using is_community boolean
@@ -158,9 +168,8 @@ function RecipeList({
       }
 
       if (diet.length > 0) {
-        // Only apply diet filters to Spoonacular recipes since community recipes don't have diet info
         filteredRecipes = filteredRecipes.filter(recipe => {
-          if (recipe.isCommunityRecipe) return true; // Keep all community recipes
+          if (recipe.isCommunityRecipe) return true;
           const recipeDiets = recipe.diets || [];
           return diet.some(d => recipeDiets.includes(d));
         });
@@ -180,17 +189,20 @@ function RecipeList({
         });
       }
 
-      return filteredRecipes;
+      return { recipes: filteredRecipes, totalResults: filteredRecipes.length };
     } catch (error) {
       console.error("Error fetching favorite recipes:", error);
       throw error;
     }
   }, [search, diet, allergy, mood, assignMood]);
 
+  // Initial load or filter change
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
     setError("");
+    setCurrentPage(1);
+    setHasMore(true);
 
     let fetchFunction;
     if (isFavoritesPage) {
@@ -198,11 +210,20 @@ function RecipeList({
     } else if (isCommunityList) {
       fetchFunction = fetchCommunityRecipes;
     } else {
-      fetchFunction = fetchSpoonacularRecipes;
+      fetchFunction = (controller) => fetchSpoonacularRecipes(controller, 0, RECIPES_PER_PAGE);
     }
 
     fetchFunction(controller)
-      .then(setRecipes)
+      .then((result) => {
+        setRecipes(result.recipes);
+        
+        // Check if there are more recipes available (only for Spoonacular with infinite scroll)
+        if (enableInfiniteScroll && !isFavoritesPage && !isCommunityList) {
+          setHasMore(result.recipes.length === RECIPES_PER_PAGE && result.totalResults > RECIPES_PER_PAGE);
+        } else {
+          setHasMore(false);
+        }
+      })
       .catch((err) => {
         if (!axios.isCancel(err)) {
           console.error("API Error:", err);
@@ -220,7 +241,36 @@ function RecipeList({
       });
 
     return () => controller.abort();
-  }, [isFavoritesPage, isCommunityList, fetchSpoonacularRecipes, fetchCommunityRecipes, fetchFavoriteRecipes, refreshTrigger]);
+  }, [isFavoritesPage, isCommunityList, fetchSpoonacularRecipes, fetchCommunityRecipes, fetchFavoriteRecipes, refreshTrigger, enableInfiniteScroll]);
+
+  // Load more recipes (only for Spoonacular with infinite scroll)
+  const handleLoadMore = async () => {
+    if (!enableInfiniteScroll || isFavoritesPage || isCommunityList || loadingMore || !hasMore) {
+      return;
+    }
+
+    setLoadingMore(true);
+    setError("");
+
+    try {
+      const controller = new AbortController();
+      const offset = currentPage * RECIPES_PER_PAGE;
+      const result = await fetchSpoonacularRecipes(controller, offset, RECIPES_PER_PAGE);
+      
+      setRecipes(prev => [...prev, ...result.recipes]);
+      setCurrentPage(prev => prev + 1);
+      
+      // Check if there are more recipes
+      const totalLoaded = recipes.length + result.recipes.length;
+      setHasMore(result.recipes.length === RECIPES_PER_PAGE && totalLoaded < result.totalResults);
+      
+    } catch (error) {
+      console.error("Error loading more recipes:", error);
+      setError("Failed to load more recipes");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const handleFavoriteChange = (recipeId, isFavorited) => {
     if (isFavoritesPage && !isFavorited) {
@@ -244,19 +294,49 @@ function RecipeList({
   }
 
   return (
-    <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-      {recipes.map((recipe) => (
-        <Col key={recipe.id} className="d-flex">
-          <RecipeCard
-            recipe={recipe}
-            isCommunityRecipe={isCommunityList}
-            isFavoritesPage={isFavoritesPage}
-            onClick={!isCommunityList && !isFavoritesPage ? onRecipeClick : isCommunityList ? onRecipeClick : undefined}
-            onFavoriteChange={onFavoriteChange || handleFavoriteChange}
-          />
-        </Col>
-      ))}
-    </Row>
+    <>
+      <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+        {recipes.map((recipe) => (
+          <Col key={recipe.id} className="d-flex">
+            <RecipeCard
+              recipe={recipe}
+              isCommunityRecipe={isCommunityList}
+              isFavoritesPage={isFavoritesPage}
+              onClick={!isCommunityList && !isFavoritesPage ? onRecipeClick : isCommunityList ? onRecipeClick : undefined}
+              onFavoriteChange={onFavoriteChange || handleFavoriteChange}
+            />
+          </Col>
+        ))}
+      </Row>
+
+      {/* Load More Button - only show for infinite scroll enabled pages */}
+      {enableInfiniteScroll && !isFavoritesPage && !isCommunityList && (
+        <div className="text-center mt-4">
+          {hasMore ? (
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="load-more-btn"
+            >
+              {loadingMore ? (
+                <>
+                  <Spinner size="sm" className="me-2" />
+                  Loading More...
+                </>
+              ) : (
+                `Load More Recipes`
+              )}
+            </Button>
+          ) : (
+            <div className="text-muted py-3">
+              <p>You've reached the end! {recipes.length} recipes loaded.</p>
+            </div>
+          )}
+        </div>
+      )}
+    </>
   );
 }
 

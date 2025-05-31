@@ -1,24 +1,29 @@
-
 /* === Mood Selector === */
 .mood-selector h6 {
   color: #011627;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.5rem;
   letter-spacing: 0.5px;
+}
+
+.mood-selector {
+  margin-bottom: 0.75rem;
 }
 
 /* Default styling for buttons */
 .mood-selector .btn {
   border-radius: 20px !important;
-  padding: 0.4rem 1rem !important;
-  font-size: 0.85rem !important;
+  padding: 0.25rem 0.8rem !important;
+  font-size: 0.8rem !important;
   font-weight: 500 !important;
-  margin-right: 0.5rem !important;
-  margin-bottom: 0.5rem !important;
+  margin-right: 0.4rem !important;
+  margin-bottom: 0.4rem !important;
   background: transparent !important;
   transition: all 0.2s ease-in-out !important;
+  line-height: 1.2 !important;
+  min-height: auto !important;
 }
 
 /* Mood-specific outline and checked styles */
@@ -32,11 +37,11 @@
 }
 
 .mood-selector #mood-Cozy + .btn {
-  border: 2px solid #D39C74  !important;
-  color: #D39C74  !important;
+  border: 2px solid #D39C74 !important;
+  color: #D39C74 !important;
 }
 .mood-selector #mood-Cozy:checked + .btn {
-  background-color: #D39C74  !important;
+  background-color: #D39C74 !important;
   color: white !important;
 }
 

@@ -81,6 +81,18 @@ function RecipeMeta({
           {isCommunityRecipe && (
             <>
               <div className="meta-item d-flex align-items-center gap-2">
+                <FiClock className="text-primary" />
+                <span>
+                  <strong>Prep Time:</strong> {recipe?.prep_time ? `${recipe.prep_time} mins` : 'N/A'}
+                </span>
+              </div>
+              <div className="meta-item d-flex align-items-center gap-2">
+                <FiUsers className="text-primary" />
+                <span>
+                  <strong>Servings:</strong> {recipe?.servings || 'N/A'}
+                </span>
+              </div>
+              <div className="meta-item d-flex align-items-center gap-2">
                 <FiUser className="text-primary" />
                 <span>
                   <strong>Created by:</strong> {recipe?.created_by_username || "Anonymous"}

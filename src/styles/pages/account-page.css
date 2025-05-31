@@ -1,0 +1,228 @@
+/* Account Page Styles */
+.account-card {
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+}
+
+.account-card-header {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%) !important;
+  border-bottom: none !important;
+  color: white !important;
+  padding: 1.5rem !important;
+}
+
+.account-card-header h4 {
+  font-weight: 600 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Custom Tabs */
+.account-tabs .nav-tabs {
+  border-bottom: 2px solid #dee2e6 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.account-tabs .nav-link {
+  border: none !important;
+  color: #6c757d !important;
+  font-weight: 500 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 0 !important;
+  border-bottom: 3px solid transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.account-tabs .nav-link:hover {
+  background: rgba(255, 107, 107, 0.1) !important;
+  color: #FF6B6B !important;
+  border-bottom-color: rgba(255, 107, 107, 0.3) !important;
+}
+
+.account-tabs .nav-link.active {
+  background: white !important;
+  color: #FF6B6B !important;
+  border-bottom-color: #FF6B6B !important;
+  font-weight: 600 !important;
+}
+
+/* Custom Form Elements */
+.form-label-custom {
+  font-weight: 600 !important;
+  color: #2E2E2E !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.form-control-custom {
+  border: 2px solid #e9ecef !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.form-control-custom:focus {
+  border-color: #FF6B6B !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25) !important;
+}
+
+.form-control-custom:disabled {
+  background-color: #f8f9fa !important;
+  opacity: 0.8 !important;
+}
+
+/* Custom Buttons */
+.btn-main {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: 25px !important;
+  padding: 0.75rem 2rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3) !important;
+}
+
+.btn-main:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4) !important;
+  color: white !important;
+}
+
+.btn-success-custom {
+  background: #28a745 !important;
+  border: 2px solid #28a745 !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: 20px !important;
+  padding: 0.6rem 1.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success-custom:hover {
+  background: #218838 !important;
+  border-color: #1e7e34 !important;
+  transform: translateY(-1px) !important;
+  color: white !important;
+}
+
+.btn-cancel {
+  border: 2px solid #6c757d !important;
+  color: #6c757d !important;
+  font-weight: 500 !important;
+  border-radius: 20px !important;
+  padding: 0.6rem 1.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-cancel:hover {
+  background: #6c757d !important;
+  color: white !important;
+}
+
+/* Custom Alerts */
+.alert-success-custom {
+  background-color: rgba(40, 167, 69, 0.1) !important;
+  border: 1px solid #28a745 !important;
+  color: #155724 !important;
+  border-radius: 10px !important;
+}
+
+.alert-danger-custom {
+  background-color: rgba(255, 107, 107, 0.1) !important;
+  border: 1px solid #FF6B6B !important;
+  color: #721c24 !important;
+  border-radius: 10px !important;
+}
+
+/* Info Card */
+.info-card {
+  border: 1px solid #e9ecef !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+.info-card-header {
+  background: #f8f9fa !important;
+  border-bottom: 1px solid #e9ecef !important;
+  color: #2E2E2E !important;
+  padding: 1rem 1.25rem !important;
+}
+
+.info-card-header h5 {
+  font-weight: 600 !important;
+  color: #2E2E2E !important;
+}
+
+/* Custom Spinner */
+.spinner-main {
+  color: #FF6B6B !important;
+}
+
+/* My Recipes Button Styles */
+.btn-view-custom {
+  border: 1px solid #A8D5BA !important;
+  color: #A8D5BA !important;
+  border-radius: 6px !important;
+  font-size: 0.8rem !important;
+  padding: 0.4rem 0.8rem !important;
+}
+
+.btn-view-custom:hover {
+  background: #A8D5BA !important;
+  color: white !important;
+  border-color: #A8D5BA !important;
+}
+
+.btn-edit-custom {
+  border: 1px solid #6c757d !important;
+  color: #6c757d !important;
+  border-radius: 6px !important;
+  font-size: 0.8rem !important;
+  padding: 0.4rem 0.8rem !important;
+}
+
+.btn-edit-custom:hover {
+  background: #6c757d !important;
+  color: white !important;
+  border-color: #6c757d !important;
+}
+
+.btn-delete-custom {
+  border: 1px solid #dc3545 !important;
+  color: #dc3545 !important;
+  border-radius: 6px !important;
+  font-size: 0.8rem !important;
+  padding: 0.4rem 0.8rem !important;
+}
+
+.btn-delete-custom:hover:not(:disabled) {
+  background: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .account-card-header {
+    padding: 1rem !important;
+  }
+  
+  .account-tabs .nav-link {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .btn-main {
+    padding: 0.6rem 1.5rem !important;
+  }
+  
+  .d-flex.gap-2 {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+  
+  .d-flex.gap-2 .flex-fill {
+    width: 100% !important;
+  }
+}

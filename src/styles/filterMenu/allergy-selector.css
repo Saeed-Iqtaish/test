@@ -1,27 +1,76 @@
 .allergy-selector h6 {
   color: var(--dark);
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   letter-spacing: 0.5px;
 }
 
+.allergy-selector {
+  margin-bottom: 0.75rem;
+}
+
 .allergy-selector .btn {
-  border-radius: 20px !important;
-  padding: 0.5rem 1.25rem !important;
-  font-size: 0.9rem !important;
+  border-radius: 12px !important;
+  padding: 0.25rem 0.7rem !important;
+  font-size: 0.8rem !important;
   font-weight: 500 !important;
-  margin-right: 0.75rem !important;
-  margin-bottom: 0.75rem !important;
-  border: 2px solid var(--allergy) !important;
-  color: var(--allergy) !important;
+  margin-right: 0.4rem !important;
+  margin-bottom: 0.4rem !important;
+  border: 2px solid #FF6B6B !important;
+  color: #FF6B6B !important;
   background: transparent !important;
   transition: all 0.2s ease !important;
+  line-height: 1.2 !important;
+  min-height: auto !important;
 }
 
 .allergy-selector .btn:hover,
-.allergy-selector .btn-check:checked + .btn {
-  background: var(--allergy) !important;
+.allergy-selector .btn-check:checked + .btn,
+.allergy-selector .btn.user-allergy.btn-danger {
+  background: #FF6B6B !important;
+  border-color: #FF6B6B !important;
   color: white !important;
+}
+
+/* Override any user allergy special styling - keep them red like normal allergies */
+.allergy-selector .btn.user-allergy {
+  border-color: #FF6B6B !important;
+  color: #FF6B6B !important;
+  background: transparent !important;
+}
+
+.allergy-selector .btn.user-allergy:hover {
+  border-color: #FF6B6B !important;
+  background: #FF6B6B !important;
+  color: white !important;
+}
+
+.allergy-selector .btn-check:checked + .btn.user-allergy {
+  background: #FF6B6B !important;
+  border-color: #FF6B6B !important;
+  color: white !important;
+}
+
+/* Category labels */
+.allergy-category {
+  margin-bottom: 0.4rem;
+}
+
+.category-label {
+  font-size: 0.7rem;
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  text-transform: capitalize;
+}
+
+.allergy-category .btn-group {
+  margin-bottom: 0.25rem;
+}
+
+/* User allergy icon */
+.allergy-selector .btn.user-allergy small {
+  font-size: 0.6rem !important;
 }
