@@ -17,6 +17,9 @@ function RecipeCard({
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [userNote, setUserNote] = useState("");
 
+  // Determine if this is a community recipe (could be from props or recipe data)
+  const isActuallyCommunityRecipe = isCommunityRecipe || recipe.isCommunityRecipe || false;
+
   const fetchUserNote = useCallback(async () => {
     try {
       const response = await notesAPI.getNotes(recipe.id);
@@ -40,20 +43,20 @@ function RecipeCard({
   };
 
   const title = recipe.title;
-  const image = isCommunityRecipe
-    ? (recipe.image_data ? `/api/community/${recipe.id}/image` : null)
+  const image = isActuallyCommunityRecipe
+    ? (recipe.image_data ? `${process.env.REACT_APP_API_URL}/community/${recipe.id}/image` : null)
     : recipe.image;
-  const prepTime = isCommunityRecipe ? "N/A" : `${recipe.readyInMinutes} mins`;
-  const servings = isCommunityRecipe ? "N/A" : recipe.servings;
+  const prepTime = isActuallyCommunityRecipe ? "N/A" : `${recipe.readyInMinutes} mins`;
+  const servings = isActuallyCommunityRecipe ? "N/A" : recipe.servings;
   const mood = recipe.mood || "Happy";
 
-  const creatorName = isCommunityRecipe
+  const creatorName = isActuallyCommunityRecipe
     ? (recipe.created_by_username || "Anonymous")
     : null;
 
   const getCardClass = () => {
     let baseClass = "flex-fill shadow-sm h-100";
-    if (isCommunityRecipe) {
+    if (isActuallyCommunityRecipe) {
       baseClass = `community-recipe-card ${baseClass}`;
     }
     if (isFavoritesPage) {
@@ -66,6 +69,13 @@ function RecipeCard({
     if (onClick) {
       onClick(recipe);
     }
+  };
+
+  const showFavoriteButton = () => {
+    // Show favorite button in these cases:
+    // 1. Regular Spoonacular recipes (not in community list view)
+    // 2. Any recipe on the favorites page (both types)
+    return (!isCommunityRecipe || isFavoritesPage);
   };
 
   return (
@@ -95,9 +105,10 @@ function RecipeCard({
         <Card.Body className="d-flex flex-column">
           <div className="d-flex justify-content-between mb-2 align-items-start">
             <MoodBadge mood={mood} />
-            {!isCommunityRecipe && (
+            {showFavoriteButton() && (
               <FavoriteButton 
-                recipeId={recipe.id} 
+                recipeId={recipe.id}
+                isCommunityRecipe={isActuallyCommunityRecipe}
                 onFavoriteChange={onFavoriteChange}
               />
             )}
@@ -108,7 +119,7 @@ function RecipeCard({
           </Card.Title>
 
           {/* Community Recipe Content */}
-          {isCommunityRecipe && (
+          {isActuallyCommunityRecipe && !isFavoritesPage && (
             <>
               <Card.Text className="recipe-creator" style={{ fontSize: "0.85rem" }}>
                 <strong>Created by:</strong>{" "}
@@ -157,12 +168,22 @@ function RecipeCard({
                 <strong>Prep Time:</strong> {prepTime} • <strong>Servings:</strong> {servings}
               </Card.Text>
 
+              {/* Show diet badges only for Spoonacular recipes */}
+              {!isActuallyCommunityRecipe && (
+                <div className="mb-3">
+                  {recipe.diets?.slice(0, 2).map((diet) => (
+                    <Badge key={diet} bg="success" className="me-1 mb-1">
+                      {diet}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Show recipe type badge on favorites page */}
               <div className="mb-3">
-                {recipe.diets?.slice(0, 2).map((diet) => (
-                  <Badge key={diet} bg="success" className="me-1 mb-1">
-                    {diet}
-                  </Badge>
-                ))}
+                <Badge bg={isActuallyCommunityRecipe ? "info" : "primary"} className="me-1">
+                  {isActuallyCommunityRecipe ? "Community Recipe" : "Spoonacular Recipe"}
+                </Badge>
               </div>
 
               <div className="notes-section mt-auto">
@@ -192,7 +213,7 @@ function RecipeCard({
           )}
 
           {/* Regular Recipe Content (Home page) */}
-          {!isCommunityRecipe && !isFavoritesPage && (
+          {!isActuallyCommunityRecipe && !isFavoritesPage && (
             <>
               <Card.Text className="text-muted" style={{ fontSize: "0.85rem" }}>
                 Prep Time: {prepTime} &bull; Servings: {servings}
@@ -220,6 +241,7 @@ function RecipeCard({
           recipe={recipe}
           currentNote={userNote}
           onNoteSaved={handleNoteSaved}
+          isCommunityRecipe={isActuallyCommunityRecipe}
         />
       )}
     </>

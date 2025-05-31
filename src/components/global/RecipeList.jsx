@@ -39,7 +39,7 @@ function RecipeList({
     const response = await axios.get("https://api.spoonacular.com/recipes/complexSearch", {
       signal: controller.signal,
       params: {
-        apiKey: "68f91166a81747958d41b82fa5f038c9",
+        apiKey: process.env.REACT_APP_SPOONACULAR_API_KEY,
         number: 12,
         addRecipeInformation: true,
         query: search || "",
@@ -59,7 +59,7 @@ function RecipeList({
   }, [search, diet, allergy, mood, assignMood]);
 
   const fetchCommunityRecipes = useCallback(async (controller) => {
-    const response = await axios.get("http://localhost:5000/api/community", {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/community`, {
       signal: controller.signal
     });
     let filteredRecipes = response.data;
@@ -82,57 +82,96 @@ function RecipeList({
     return filteredRecipes;
   }, [search, mood, assignMood]);
 
+  // Update the fetchFavoriteRecipes function in RecipeList.jsx
+
   const fetchFavoriteRecipes = useCallback(async (controller) => {
     try {
       const favoritesResponse = await favoritesAPI.getFavorites();
-      const favoriteIds = favoritesResponse.data.map(fav => fav.recipe_id);
+      const favorites = favoritesResponse.data;
 
-      if (favoriteIds.length === 0) {
+      if (favorites.length === 0) {
         return [];
       }
 
-      const recipePromises = favoriteIds.map(async (id) => {
-        try {
-          const response = await axios.get(`https://api.spoonacular.com/recipes/${id}/information`, {
-            signal: controller.signal,
-            params: {
-              apiKey: "68f91166a81747958d41b82fa5f038c9"
-            }
-          });
+      // Separate favorites by type using is_community boolean
+      const spoonacularFavorites = favorites.filter(fav => fav.is_community === false);
+      const communityFavorites = favorites.filter(fav => fav.is_community === true);
 
-          return {
-            ...response.data,
-            mood: assignMood(response.data),
-            isFavorited: true
-          };
-        } catch (error) {
-          console.error(`Error fetching recipe ${id}:`, error);
-          return null;
-        }
-      });
+      const allRecipes = [];
 
-      const recipes = await Promise.all(recipePromises);
-      let validRecipes = recipes.filter(recipe => recipe !== null);
+      // Fetch Spoonacular recipes (is_community = false)
+      if (spoonacularFavorites.length > 0) {
+        const spoonacularPromises = spoonacularFavorites.map(async (fav) => {
+          try {
+            const response = await axios.get(`https://api.spoonacular.com/recipes/${fav.recipe_id}/information`, {
+              signal: controller.signal,
+              params: {
+                apiKey: process.env.REACT_APP_SPOONACULAR_API_KEY
+              }
+            });
+
+            return {
+              ...response.data,
+              mood: assignMood(response.data),
+              isFavorited: true,
+              isCommunityRecipe: false
+            };
+          } catch (error) {
+            console.error(`Error fetching Spoonacular recipe ${fav.recipe_id}:`, error);
+            return null;
+          }
+        });
+
+        const spoonacularRecipes = await Promise.all(spoonacularPromises);
+        allRecipes.push(...spoonacularRecipes.filter(recipe => recipe !== null));
+      }
+
+      // Fetch Community recipes (is_community = true)
+      if (communityFavorites.length > 0) {
+        const communityPromises = communityFavorites.map(async (fav) => {
+          try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/community/${fav.recipe_id}`);
+
+            return {
+              ...response.data,
+              mood: assignMood(response.data),
+              isFavorited: true,
+              isCommunityRecipe: true
+            };
+          } catch (error) {
+            console.error(`Error fetching community recipe ${fav.recipe_id}:`, error);
+            return null;
+          }
+        });
+
+        const communityRecipes = await Promise.all(communityPromises);
+        allRecipes.push(...communityRecipes.filter(recipe => recipe !== null));
+      }
+
+      // Apply filters
+      let filteredRecipes = allRecipes;
 
       if (search) {
-        validRecipes = validRecipes.filter(recipe =>
+        filteredRecipes = filteredRecipes.filter(recipe =>
           recipe.title.toLowerCase().includes(search.toLowerCase())
         );
       }
 
       if (diet.length > 0) {
-        validRecipes = validRecipes.filter(recipe => {
+        // Only apply diet filters to Spoonacular recipes since community recipes don't have diet info
+        filteredRecipes = filteredRecipes.filter(recipe => {
+          if (recipe.isCommunityRecipe) return true; // Keep all community recipes
           const recipeDiets = recipe.diets || [];
           return diet.some(d => recipeDiets.includes(d));
         });
       }
 
       if (mood.length > 0) {
-        validRecipes = validRecipes.filter(recipe => mood.includes(recipe.mood));
+        filteredRecipes = filteredRecipes.filter(recipe => mood.includes(recipe.mood));
       }
 
       if (allergy.length > 0) {
-        validRecipes = validRecipes.filter(recipe => {
+        filteredRecipes = filteredRecipes.filter(recipe => {
           const recipeText = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
           const hasAllergen = allergy.some(allergen =>
             recipeText.includes(allergen.toLowerCase())
@@ -141,7 +180,7 @@ function RecipeList({
         });
       }
 
-      return validRecipes;
+      return filteredRecipes;
     } catch (error) {
       console.error("Error fetching favorite recipes:", error);
       throw error;

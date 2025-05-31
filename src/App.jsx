@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Home from "./Home";
 import CommunityPage from "./pages/CommunityPage";
+import CommunityRecipePage from "./pages/CommunityRecipePage";
 import FavoritesPage from "./pages/FavoritesPage";
 import AccountPage from "./pages/AccountPage";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -21,6 +22,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               <Route path="/community" element={<CommunityPage />} />
+              <Route path="/community/:id" element={<CommunityRecipePage />} />
               <Route path="/account" element={<AccountPage />} />
             </Routes>
           </main>

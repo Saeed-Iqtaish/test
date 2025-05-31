@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "react-bootstrap";
 import { FiHeart } from "react-icons/fi";
-import { useAuth } from "../../contexts/AuthContext"; // Fixed import
+import { useAuth } from "../../contexts/AuthContext";
 import { favoritesAPI } from "../../services/api";
 
-function FavoriteButton({ recipeId, onFavoriteChange }) {
+function FavoriteButton({ 
+  recipeId, 
+  isCommunityRecipe = false, // boolean instead of string
+  onFavoriteChange 
+}) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [loading, setLoading] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -12,18 +16,20 @@ function FavoriteButton({ recipeId, onFavoriteChange }) {
   const checkIfFavorited = useCallback(async () => {
     try {
       const response = await favoritesAPI.getFavorites();
-      const isFav = response.data.some(fav => fav.recipe_id === recipeId);
+      const isFav = response.data.some(fav => 
+        fav.recipe_id === recipeId && fav.is_community === isCommunityRecipe
+      );
       setIsFavorited(isFav);
     } catch (error) {
       console.error("Error checking favorite status:", error);
     }
-  }, [recipeId]);
+  }, [recipeId, isCommunityRecipe]);
 
   useEffect(() => {
     if (isAuthenticated) {
       checkIfFavorited();
     }
-  }, [recipeId, isAuthenticated, checkIfFavorited]);
+  }, [recipeId, isCommunityRecipe, isAuthenticated, checkIfFavorited]);
 
   async function handleToggleFavorite() {
     if (!isAuthenticated) {
@@ -35,11 +41,11 @@ function FavoriteButton({ recipeId, onFavoriteChange }) {
 
     try {
       if (isFavorited) {
-        await favoritesAPI.removeFavorite(recipeId);
+        await favoritesAPI.removeFavorite(recipeId, isCommunityRecipe);
         setIsFavorited(false);
         onFavoriteChange?.(recipeId, false);
       } else {
-        await favoritesAPI.addFavorite(recipeId);
+        await favoritesAPI.addFavorite(recipeId, isCommunityRecipe);
         setIsFavorited(true);
         onFavoriteChange?.(recipeId, true);
       }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "../components/auth/AuthModal";
 import CommunityHeader from "../components/community/CommunityHeader";
@@ -11,9 +12,12 @@ import "../styles/global/global.css";
 
 function CommunityPage() {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  
   const [filters, setFilters] = useState({
     search: "",
     diet: [],
@@ -59,8 +63,12 @@ function CommunityPage() {
 
   function handleAuthSuccess() {
     setShowAuthModal(false);
-    // If they were trying to create a recipe, open that modal
     setShowCreateModal(true);
+  }
+
+  function handleRecipeClick(recipe) {
+    // Navigate to the community recipe details page
+    navigate(`/community/${recipe.id}`);
   }
 
   return (
@@ -90,20 +98,19 @@ function CommunityPage() {
             diet={appliedFilters.diet}
             allergy={appliedFilters.allergy}
             mood={appliedFilters.mood}
-            isCommunityList={true}
+            type="community"
             refreshTrigger={refreshTrigger}
+            onRecipeClick={handleRecipeClick}
           />
         </div>
       </Container>
 
-      {/* Auth Modal for non-authenticated users */}
       <AuthModal
         show={showAuthModal}
         onHide={() => setShowAuthModal(false)}
         onSuccess={handleAuthSuccess}
       />
 
-      {/* Create Recipe Modal - Only show if authenticated */}
       {isAuthenticated && (
         <CreateRecipeModal
           show={showCreateModal}

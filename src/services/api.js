@@ -49,8 +49,25 @@ export const userAPI = {
 
 export const favoritesAPI = {
   getFavorites: () => api.get('/favorites'),
-  addFavorite: (recipeId) => api.post('/favorites', { recipe_id: recipeId }),
-  removeFavorite: (recipeId) => api.delete('/favorites', { data: { recipe_id: recipeId } }),
+  
+  addFavorite: (recipeId, isCommunity = false) => 
+    api.post('/favorites', { 
+      recipe_id: recipeId, 
+      is_community: isCommunity 
+    }),
+  
+  removeFavorite: (recipeId, isCommunity = false) => 
+    api.delete('/favorites', { 
+      data: { 
+        recipe_id: recipeId, 
+        is_community: isCommunity 
+      } 
+    }),
+  
+  checkFavorite: (recipeId, isCommunity = false) => 
+    api.get(`/favorites/check/${recipeId}`, {
+      params: { is_community: isCommunity }
+    }),
 };
 
 export const notesAPI = {
