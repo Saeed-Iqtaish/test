@@ -98,7 +98,7 @@ function CommunityPage() {
             diet={appliedFilters.diet}
             allergy={appliedFilters.allergy}
             mood={appliedFilters.mood}
-            type="community"
+            isCommunityList={true}  // FIXED: Changed from type="community" to isCommunityList={true}
             refreshTrigger={refreshTrigger}
             onRecipeClick={handleRecipeClick}
           />

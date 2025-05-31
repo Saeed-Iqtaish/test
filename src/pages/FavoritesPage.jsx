@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Container, Button } from "react-bootstrap";
 import { FiFilter } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "../components/auth/AuthModal";
 import FavoritesHeader from "../components/favorites/FavoritesHeader";
 import SearchBar from "../components/global/SearchBar";
 import FilterPanel from "../components/filterPanel/FilterPanel";
 import RecipeList from "../components/global/RecipeList";
+import RecipeDetails from "../components/global/RecipeDetails";
 import "../styles/global/global.css";
 
 function FavoritesPage() {
   const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showRecipeDetails, setShowRecipeDetails] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [filters, setFilters] = useState({
     search: "",
     diet: [],
@@ -41,6 +46,33 @@ function FavoritesPage() {
     const cleared = { search: "", diet: [], allergy: [], mood: [] };
     setFilters(cleared);
     setAppliedFilters(cleared);
+  }
+
+  function handleRecipeClick(recipe) {
+    // Show modal first for all recipes
+    setSelectedRecipe(recipe);
+    setShowRecipeDetails(true);
+  }
+
+  function handleRecipeDetailsClose() {
+    setShowRecipeDetails(false);
+    setSelectedRecipe(null);
+  }
+
+  function handleViewFullRecipe(recipe) {
+    // Navigate to full recipe page from modal
+    if (recipe.isCommunityRecipe) {
+      navigate(`/community/${recipe.id}`);
+    } else {
+      // For API recipes, could navigate to a recipe detail page or just close modal
+      console.log('API recipe - could implement full recipe page');
+    }
+    setShowRecipeDetails(false);
+  }
+
+  function handleFavoriteChange(recipeId, isFavorited) {
+    console.log(`Recipe ${recipeId} favorite status changed: ${isFavorited}`);
+    // Recipe will be automatically removed from favorites list if unfavorited
   }
 
   if (isLoading) {
@@ -79,46 +111,60 @@ function FavoritesPage() {
   }
 
   return (
-    <Container fluid className="px-3 px-md-5">
-      <FavoritesHeader />
-      
-      {/* Search and Filter Controls - Same pattern as Home */}
-      <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mb-4">
-        <div className="flex-grow-1 w-100">
-          <SearchBar
-            searchTerm={filters.search}
-            setSearchTerm={(val) => setFilters((prev) => ({ ...prev, search: val }))}
+    <>
+      <Container fluid className="px-3 px-md-5">
+        <FavoritesHeader />
+        
+        {/* Search and Filter Controls - Same pattern as Home */}
+        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mb-4">
+          <div className="flex-grow-1 w-100">
+            <SearchBar
+              searchTerm={filters.search}
+              setSearchTerm={(val) => setFilters((prev) => ({ ...prev, search: val }))}
+            />
+          </div>
+          <div className="text-end">
+            <button
+              className={`filter-button ${showFilters ? "active" : ""}`}
+              onClick={() => setShowFilters((prev) => !prev)}
+            >
+              <FiFilter className="filter-icon" />
+              Filter
+            </button>
+          </div>
+        </div>
+
+        <FilterPanel
+          show={showFilters}
+          filters={filters}
+          setFilters={setFilters}
+          onApply={handleApplyFilters}
+          onClear={handleClearFilters}
+        />
+
+        <div className="mt-4">
+          <RecipeList
+            search={appliedFilters.search}
+            diet={appliedFilters.diet}
+            allergy={appliedFilters.allergy}
+            mood={appliedFilters.mood}
+            isFavoritesPage={true}
+            onRecipeClick={handleRecipeClick}
+            onFavoriteChange={handleFavoriteChange}
           />
         </div>
-        <div className="text-end">
-          <button
-            className={`filter-button ${showFilters ? "active" : ""}`}
-            onClick={() => setShowFilters((prev) => !prev)}
-          >
-            <FiFilter className="filter-icon" />
-            Filter
-          </button>
-        </div>
-      </div>
+      </Container>
 
-      <FilterPanel
-        show={showFilters}
-        filters={filters}
-        setFilters={setFilters}
-        onApply={handleApplyFilters}
-        onClear={handleClearFilters}
+      {/* Recipe Details Modal for Favorites */}
+      <RecipeDetails
+        show={showRecipeDetails}
+        onHide={handleRecipeDetailsClose}
+        recipe={selectedRecipe}
+        isCommunityRecipe={selectedRecipe?.isCommunityRecipe || false}
+        onFavoriteChange={handleFavoriteChange}
+        onViewFullRecipe={handleViewFullRecipe}
       />
-
-      <div className="mt-4">
-        <RecipeList
-          search={appliedFilters.search}
-          diet={appliedFilters.diet}
-          allergy={appliedFilters.allergy}
-          mood={appliedFilters.mood}
-          isFavoritesPage={true}
-        />
-      </div>
-    </Container>
+    </>
   );
 }
 

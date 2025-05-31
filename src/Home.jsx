@@ -5,10 +5,12 @@ import SearchBar from "./components/global/SearchBar";
 import FilterPanel from "./components/filterPanel/FilterPanel";
 import RecipeList from "./components/global/RecipeList";
 import RecipeDetails from "./components/global/RecipeDetails";
+import { AuthModal } from "./components/auth/AuthModal";
 import "./styles/global/global.css"
 
 function Home() {
   const [showFilters, setShowFilters] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
     diet: [],
@@ -55,6 +57,14 @@ function Home() {
     console.log(`Recipe ${recipeId} favorite status changed: ${isFavorited}`);
   }
 
+  function handleLoginRequired() {
+    setShowAuthModal(true);
+  }
+
+  function handleAuthSuccess() {
+    setShowAuthModal(false);
+  }
+
   return (
     <>
       <Container fluid className="px-3 px-md-5">
@@ -94,6 +104,7 @@ function Home() {
             mood={appliedFilters.mood}
             onRecipeClick={handleRecipeClick}
             onFavoriteChange={handleFavoriteChange}
+            onLoginRequired={handleLoginRequired}
           />
         </div>
 
@@ -105,6 +116,13 @@ function Home() {
           onFavoriteChange={handleFavoriteChange}
         />
       </Container>
+
+      {/* Auth Modal for login prompts */}
+      <AuthModal
+        show={showAuthModal}
+        onHide={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+      />
     </>
   );
 }

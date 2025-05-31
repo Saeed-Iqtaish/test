@@ -17,7 +17,8 @@ function RecipeDetails({
   onHide, 
   recipe, 
   isCommunityRecipe = false,
-  onFavoriteChange 
+  onFavoriteChange,
+  onViewFullRecipe // New prop for viewing full community recipe page
 }) {
   const [recipeDetails, setRecipeDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -100,6 +101,12 @@ function RecipeDetails({
     onHide();
   };
 
+  const handleViewFullRecipe = () => {
+    if (onViewFullRecipe && recipe) {
+      onViewFullRecipe(recipe);
+    }
+  };
+
   if (!recipe) return null;
 
   return (
@@ -167,7 +174,7 @@ function RecipeDetails({
               {/* Notes tab for authenticated users */}
               {isAuthenticated && (
                 <Tab eventKey="notes" title="My Notes">
-                  <RecipeNotes recipe={recipe} />
+                  <RecipeNotes recipe={recipe} isCommunityRecipe={isCommunityRecipe} />
                 </Tab>
               )}
 
@@ -191,6 +198,17 @@ function RecipeDetails({
           Close
         </Button>
         
+        {/* For community recipes, show "View Full Recipe" button */}
+        {isCommunityRecipe && onViewFullRecipe && (
+          <Button
+            variant="primary"
+            onClick={handleViewFullRecipe}
+          >
+            View Full Recipe
+          </Button>
+        )}
+        
+        {/* For Spoonacular recipes, show original source link */}
         {!isCommunityRecipe && recipeDetails?.sourceUrl && (
           <Button
             variant="primary"

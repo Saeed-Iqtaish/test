@@ -4,6 +4,7 @@ import { FiEdit3 } from "react-icons/fi";
 import MoodBadge from "./MoodBadge";
 import RecipeNotesModal from "../favorites/RecipeNotesModal";
 import FavoriteButton from './FavoriteButton';
+import { AuthModal } from "../auth/AuthModal";
 import { notesAPI } from "../../services/api";
 import "../../styles/global/recipe-card.css";
 
@@ -15,6 +16,7 @@ function RecipeCard({
   onFavoriteChange 
 }) {
   const [showNotesModal, setShowNotesModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [userNote, setUserNote] = useState("");
 
   // Determine if this is a community recipe (could be from props or recipe data)
@@ -22,14 +24,14 @@ function RecipeCard({
 
   const fetchUserNote = useCallback(async () => {
     try {
-      const response = await notesAPI.getNotes(recipe.id);
+      const response = await notesAPI.getNotes(recipe.id, isActuallyCommunityRecipe);
       if (response.data.length > 0) {
         setUserNote(response.data[0].note);
       }
     } catch (error) {
       console.error("Error fetching note:", error);
     }
-  }, [recipe.id]);
+  }, [recipe.id, isActuallyCommunityRecipe]);
 
   useEffect(() => {
     if (isFavoritesPage) {
@@ -40,6 +42,15 @@ function RecipeCard({
   const handleNoteSaved = (note) => {
     setUserNote(note);
     setShowNotesModal(false);
+  };
+
+  const handleLoginRequired = () => {
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    // The favorite button will automatically update when auth state changes
   };
 
   const title = recipe.title;
@@ -72,18 +83,24 @@ function RecipeCard({
   };
 
   const showFavoriteButton = () => {
-    // Show favorite button in these cases:
-    // 1. Regular Spoonacular recipes (not in community list view)
-    // 2. Any recipe on the favorites page (both types)
-    return (!isCommunityRecipe || isFavoritesPage);
+    // Always show favorite button to allow users to favorite any recipe
+    return true;
+  };
+
+  // Determine if card should be clickable
+  const isClickable = () => {
+    // Make cards clickable when:
+    // 1. onClick handler is provided (Home page for API recipes, Community page for community recipes)
+    // 2. On favorites page (both types should open modal)
+    return onClick !== undefined;
   };
 
   return (
     <>
       <Card
-        className={`${getCardClass()} ${onClick ? 'clickable-card' : ''}`}
-        onClick={handleClick}
-        style={{ cursor: onClick ? 'pointer' : 'default' }}
+        className={`${getCardClass()} ${isClickable() ? 'clickable-card' : ''}`}
+        onClick={isClickable() ? handleClick : undefined}
+        style={{ cursor: isClickable() ? 'pointer' : 'default' }}
       >
         {image ? (
           <Card.Img
@@ -110,6 +127,7 @@ function RecipeCard({
                 recipeId={recipe.id}
                 isCommunityRecipe={isActuallyCommunityRecipe}
                 onFavoriteChange={onFavoriteChange}
+                onLoginRequired={handleLoginRequired}
               />
             )}
           </div>
@@ -150,6 +168,11 @@ function RecipeCard({
                 <small className="recipe-date">
                   Created: {new Date(recipe.created_at).toLocaleDateString()}
                 </small>
+                {isClickable() && (
+                  <small className="d-block text-primary mt-1">
+                    Click to preview →
+                  </small>
+                )}
               </div>
             </>
           )}
@@ -228,10 +251,23 @@ function RecipeCard({
                   );
                 })}
               </div>
+
+              {isClickable() && (
+                <small className="text-primary mt-2">
+                  Click to view details →
+                </small>
+              )}
             </>
           )}
         </Card.Body>
       </Card>
+
+      {/* Auth Modal for login prompt */}
+      <AuthModal
+        show={showAuthModal}
+        onHide={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+      />
 
       {/* Notes Modal for Favorites Page */}
       {isFavoritesPage && (

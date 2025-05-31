@@ -1,0 +1,85 @@
+/* Add to src/styles/global/recipe-card.css */
+
+/* Favorite Button Styles */
+.favorite-btn {
+  transition: transform 0.2s ease, color 0.2s ease !important;
+  color: #6c757d !important;
+  text-decoration: none !important;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.1);
+  color: var(--main) !important;
+  text-decoration: none !important;
+}
+
+.favorite-btn:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.heart-icon {
+  transition: all 0.2s ease;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+/* Favorited state - filled heart */
+.heart-icon.favorited {
+  fill: var(--main);
+  stroke: var(--main);
+  color: var(--main) !important;
+}
+
+/* Not authenticated state - lighter color with hover hint */
+.heart-icon.not-authenticated {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}
+
+.heart-icon.not-authenticated:hover {
+  color: var(--main) !important;
+  opacity: 1;
+}
+
+/* Disabled state for loading */
+.favorite-btn:disabled .heart-icon {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Heart animation on click */
+.favorite-btn:active .heart-icon {
+  transform: scale(0.9);
+}
+
+/* Hover effects for different states */
+.favorite-btn:hover .heart-icon:not(.favorited):not(.not-authenticated) {
+  stroke: var(--main);
+  color: var(--main) !important;
+}
+
+.favorite-btn:hover .heart-icon.favorited {
+  fill: #ff5252;
+  stroke: #ff5252;
+  color: #ff5252 !important;
+}
+
+/* Focus styles for accessibility */
+.favorite-btn:focus-visible {
+  outline: 2px solid var(--main);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .heart-icon {
+    font-size: 1.1rem;
+  }
+  
+  .favorite-btn:hover {
+    transform: scale(1.05);
+  }
+}
