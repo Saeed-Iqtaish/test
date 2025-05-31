@@ -12,7 +12,8 @@ function RecipeList({
   isCommunityList = false,
   isFavoritesPage = false,
   refreshTrigger = 0,
-  onRecipeClick
+  onRecipeClick,
+  onFavoriteChange
 }) {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -85,7 +86,7 @@ function RecipeList({
     try {
       const favoritesResponse = await favoritesAPI.getFavorites();
       const favoriteIds = favoritesResponse.data.map(fav => fav.recipe_id);
-      
+
       if (favoriteIds.length === 0) {
         return [];
       }
@@ -98,7 +99,7 @@ function RecipeList({
               apiKey: "68f91166a81747958d41b82fa5f038c9"
             }
           });
-          
+
           return {
             ...response.data,
             mood: assignMood(response.data),
@@ -133,7 +134,7 @@ function RecipeList({
       if (allergy.length > 0) {
         validRecipes = validRecipes.filter(recipe => {
           const recipeText = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
-          const hasAllergen = allergy.some(allergen => 
+          const hasAllergen = allergy.some(allergen =>
             recipeText.includes(allergen.toLowerCase())
           );
           return !hasAllergen;
@@ -190,7 +191,7 @@ function RecipeList({
 
   if (loading) return <Spinner animation="border" />;
   if (error) return <Alert variant="danger">{error}</Alert>;
-  
+
   if (!recipes.length) {
     if (isFavoritesPage) {
       return (
@@ -207,12 +208,12 @@ function RecipeList({
     <Row xs={1} sm={2} md={3} lg={4} className="g-4">
       {recipes.map((recipe) => (
         <Col key={recipe.id} className="d-flex">
-          <RecipeCard 
-            recipe={recipe} 
+          <RecipeCard
+            recipe={recipe}
             isCommunityRecipe={isCommunityList}
             isFavoritesPage={isFavoritesPage}
-            onClick={isCommunityList ? onRecipeClick : undefined}
-            onFavoriteChange={handleFavoriteChange}
+            onClick={!isCommunityList && !isFavoritesPage ? onRecipeClick : isCommunityList ? onRecipeClick : undefined}
+            onFavoriteChange={onFavoriteChange || handleFavoriteChange}
           />
         </Col>
       ))}

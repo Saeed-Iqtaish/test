@@ -6,27 +6,45 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-export const setAuthToken = (getAccessTokenSilently) => {
-  api.interceptors.request.use(
-    async (config) => {
-      try {
-        const token = await getAccessTokenSilently();
-        config.headers.Authorization = `Bearer ${token}`;
-      } catch (error) {
-        console.error('Error getting access token:', error);
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
+// Add token to requests automatically
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  );
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Handle token expiration
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      // Optionally redirect to login or refresh the page
+      window.location.reload();
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const authAPI = {
+  login: (email, password) => 
+    axios.post(`${API_BASE_URL}/auth/login`, { email, password }),
+  signup: (username, email, password) => 
+    axios.post(`${API_BASE_URL}/auth/signup`, { username, email, password }),
+  getMe: () => api.get('/auth/me'),
 };
 
 export const userAPI = {
-  createProfile: () => api.post('/users/profile'),
   getProfile: () => api.get('/users/me'),
   updateProfile: (data) => api.put('/users/me', data),
+  getAllUsers: () => api.get('/users'),
 };
 
 export const favoritesAPI = {

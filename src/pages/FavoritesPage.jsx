@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Container } from "react-bootstrap";
+import { Container, Button } from "react-bootstrap";
 import { FiFilter } from "react-icons/fi";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../contexts/AuthContext";
+import { AuthModal } from "../components/auth/AuthModal";
 import FavoritesHeader from "../components/favorites/FavoritesHeader";
 import SearchBar from "../components/global/SearchBar";
 import FilterPanel from "../components/filterPanel/FilterPanel";
 import RecipeList from "../components/global/RecipeList";
-import LoginButton from "../components/auth/LoginButton";
 import "../styles/global/global.css";
 
 function FavoritesPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
@@ -42,15 +43,38 @@ function FavoritesPage() {
     setAppliedFilters(cleared);
   }
 
-  if (!isAuthenticated) {
+  if (isLoading) {
     return (
       <Container className="text-center py-5">
-        <div className="alert alert-info">
-          <h4 className="alert-heading">Login Required</h4>
-          <p className="mb-4">You need to be logged in to view your favorite recipes.</p>
-          <LoginButton />
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
         </div>
       </Container>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Container className="text-center py-5">
+          <div className="alert alert-info">
+            <h4 className="alert-heading">Login Required</h4>
+            <p className="mb-4">You need to be logged in to view your favorite recipes.</p>
+            <Button 
+              variant="primary"
+              onClick={() => setShowAuthModal(true)}
+            >
+              Log In
+            </Button>
+          </div>
+        </Container>
+
+        <AuthModal
+          show={showAuthModal}
+          onHide={() => setShowAuthModal(false)}
+          onSuccess={() => setShowAuthModal(false)}
+        />
+      </>
     );
   }
 

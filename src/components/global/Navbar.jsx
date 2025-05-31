@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import LoginButton from "../auth/LoginButton";
-import LogoutButton from "../auth/LogoutButton";
+import { Button } from "react-bootstrap";
+import { useAuth } from "../../contexts/AuthContext";
+import { AuthModal } from "../auth/AuthModal";
 import Profile from "../auth/Profile";
 import "../../styles/global/navbar.css";
 
 function AppNavbar() {
   const { isAuthenticated, isLoading, isAdmin } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   if (isLoading) {
     return (
@@ -20,43 +21,57 @@ function AppNavbar() {
     );
   }
 
-  return (
-    <header className="navbar">
-      <div className="navbar-container">
-        <h1 className="navbar-title">Mood Meals</h1>
-        
-        <nav className="nav-pills">
-          <NavLink to="/" end className="nav-pill">
-            Home
-          </NavLink>
-          <NavLink to="/favorites" className="nav-pill">
-            Favorites
-          </NavLink>
-          <NavLink to="/community" className="nav-pill">
-            Community
-          </NavLink>
-          <NavLink to="/account" className="nav-pill">
-            Account
-          </NavLink>
-          {isAdmin && (
-            <NavLink to="/admin" className="nav-pill admin-link">
-              Admin
-            </NavLink>
-          )}
-        </nav>
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+  };
 
-        <div className="auth-section d-flex align-items-center gap-3">
-          {isAuthenticated ? (
-            <>
+  return (
+    <>
+      <header className="navbar">
+        <div className="navbar-container">
+          <h1 className="navbar-title">Mood Meals</h1>
+          
+          <nav className="nav-pills">
+            <NavLink to="/" end className="nav-pill">
+              Home
+            </NavLink>
+            <NavLink to="/favorites" className="nav-pill">
+              Favorites
+            </NavLink>
+            <NavLink to="/community" className="nav-pill">
+              Community
+            </NavLink>
+            <NavLink to="/account" className="nav-pill">
+              Account
+            </NavLink>
+            {isAdmin && (
+              <NavLink to="/admin" className="nav-pill admin-link">
+                Admin
+              </NavLink>
+            )}
+          </nav>
+
+          <div className="auth-section d-flex align-items-center gap-3">
+            {isAuthenticated ? (
               <Profile />
-              <LogoutButton />
-            </>
-          ) : (
-            <LoginButton />
-          )}
+            ) : (
+              <Button 
+                variant="primary" 
+                onClick={() => setShowAuthModal(true)}
+              >
+                Log In
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <AuthModal
+        show={showAuthModal}
+        onHide={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+      />
+    </>
   );
 }
 

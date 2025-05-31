@@ -1,24 +1,50 @@
 import React from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { Button, Dropdown } from 'react-bootstrap';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Profile = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, logout } = useAuth();
 
-  if (!isAuthenticated || !user) {
+  if (!user) {
     return null;
   }
 
   return (
-    <div className="d-flex align-items-center">
-      <img
-        src={user.picture}
-        alt={user.name}
-        className="rounded-circle me-2"
-        width="32"
-        height="32"
-      />
-      <span className="text-muted">{user.name}</span>
-    </div>
+    <Dropdown>
+      <Dropdown.Toggle 
+        variant="outline-primary" 
+        id="profile-dropdown"
+        className="d-flex align-items-center gap-2"
+      >
+        <div className="d-flex align-items-center">
+          <div 
+            className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
+            style={{ width: '32px', height: '32px', fontSize: '14px', fontWeight: 'bold' }}
+          >
+            {user.username.charAt(0).toUpperCase()}
+          </div>
+          <span>{user.username}</span>
+        </div>
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu>
+        <Dropdown.ItemText>
+          <strong>{user.username}</strong>
+          <br />
+          <small className="text-muted">{user.email}</small>
+          {user.isAdmin && (
+            <>
+              <br />
+              <small className="text-success">Admin</small>
+            </>
+          )}
+        </Dropdown.ItemText>
+        <Dropdown.Divider />
+        <Dropdown.Item onClick={logout}>
+          Log Out
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 };
 
