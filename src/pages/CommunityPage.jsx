@@ -7,6 +7,7 @@ import CommunityHeader from "../components/community/CommunityHeader";
 import CommunityControls from "../components/community/CommunityControls";
 import FilterPanel from "../components/filterPanel/FilterPanel";
 import RecipeList from "../components/global/RecipeList";
+import RecipeDetails from "../components/global/RecipeDetails";
 import CreateRecipeModal from "../components/community/CreateRecipeModal";
 import "../styles/global/global.css";
 
@@ -17,6 +18,8 @@ function CommunityPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showRecipeDetails, setShowRecipeDetails] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
   
   const [filters, setFilters] = useState({
     search: "",
@@ -66,9 +69,25 @@ function CommunityPage() {
     setShowCreateModal(true);
   }
 
+  // Updated to show modal first instead of navigating directly
   function handleRecipeClick(recipe) {
-    // Navigate to the community recipe details page
+    setSelectedRecipe(recipe);
+    setShowRecipeDetails(true);
+  }
+
+  function handleRecipeDetailsClose() {
+    setShowRecipeDetails(false);
+    setSelectedRecipe(null);
+  }
+
+  function handleViewFullRecipe(recipe) {
+    // Navigate to the full community recipe page from modal
     navigate(`/community/${recipe.id}`);
+    setShowRecipeDetails(false);
+  }
+
+  function handleFavoriteChange(recipeId, isFavorited) {
+    console.log(`Recipe ${recipeId} favorite status changed: ${isFavorited}`);
   }
 
   return (
@@ -98,12 +117,23 @@ function CommunityPage() {
             diet={appliedFilters.diet}
             allergy={appliedFilters.allergy}
             mood={appliedFilters.mood}
-            isCommunityList={true}  // FIXED: Changed from type="community" to isCommunityList={true}
+            isCommunityList={true}
             refreshTrigger={refreshTrigger}
             onRecipeClick={handleRecipeClick}
+            onFavoriteChange={handleFavoriteChange}
           />
         </div>
       </Container>
+
+      {/* Recipe Details Modal for Community Recipes */}
+      <RecipeDetails
+        show={showRecipeDetails}
+        onHide={handleRecipeDetailsClose}
+        recipe={selectedRecipe}
+        isCommunityRecipe={true}
+        onFavoriteChange={handleFavoriteChange}
+        onViewFullRecipe={handleViewFullRecipe}
+      />
 
       <AuthModal
         show={showAuthModal}

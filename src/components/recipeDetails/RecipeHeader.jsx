@@ -2,7 +2,19 @@ import React from 'react'
 import { Badge } from "react-bootstrap";
 import MoodBadge from '../global/MoodBadge';
 
-function RecipeHeader({ title, image, mood, isCommunityRecipe, approved, isModal = false }) {
+function RecipeHeader({ title, image, mood, isCommunityRecipe, approved, isModal = false, recipe }) {
+  // Helper function to get the correct image URL
+  const getImageUrl = () => {
+    if (image) return image; // If image prop is provided, use it
+    
+    // For community recipes, construct the API URL
+    if (isCommunityRecipe && recipe?.image_data) {
+      return `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image`;
+    }
+    
+    return null;
+  };
+
   // If this is being used in a modal, render differently
   if (isModal) {
     return (
@@ -26,11 +38,23 @@ function RecipeHeader({ title, image, mood, isCommunityRecipe, approved, isModal
   }
 
   // Original implementation for full recipe pages
+  const imageUrl = getImageUrl();
+
   return (
     <div className="recipe-header">
-      <div className="recipe-image-container">
-        <img src={image} alt={title} className="recipe-image" />
-      </div>
+      {imageUrl && (
+        <div className="recipe-image-container">
+          <img 
+            src={imageUrl} 
+            alt={title} 
+            className="recipe-image"
+            onError={(e) => {
+              console.error('Error loading recipe header image:', e.target.src);
+              e.target.style.display = 'none';
+            }}
+          />
+        </div>
+      )}
 
       <div className="recipe-title-group">
         <h1 className="recipe-title">{title}</h1>

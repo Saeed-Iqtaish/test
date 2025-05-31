@@ -28,7 +28,10 @@ function RecipeMeta({
 
   const getRecipeImage = () => {
     if (isCommunityRecipe) {
-      return recipe?.image_data ? `/api/community/${recipe.id}/image` : null;
+      // Fixed: Use the correct API base URL for community recipe images
+      return recipe?.image_data ? 
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image` : 
+        null;
     }
     return recipe?.image || recipeDetails?.image;
   };
@@ -46,6 +49,10 @@ function RecipeMeta({
               maxHeight: '300px', 
               objectFit: 'cover', 
               borderRadius: '12px' 
+            }}
+            onError={(e) => {
+              console.error('Error loading recipe image:', e.target.src);
+              e.target.style.display = 'none';
             }}
           />
         </div>
