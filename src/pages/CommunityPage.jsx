@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "../components/auth/AuthModal";
 import CommunityHeader from "../components/community/CommunityHeader";

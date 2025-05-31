@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "react-bootstrap";
 import { FiHeart } from "react-icons/fi";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../contexts/AuthContext"; // Fixed import
 import { favoritesAPI } from "../../services/api";
 
 function FavoriteButton({ recipeId, onFavoriteChange }) {
@@ -9,13 +9,7 @@ function FavoriteButton({ recipeId, onFavoriteChange }) {
   const [loading, setLoading] = useState(false);
   const { isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      checkIfFavorited();
-    }
-  }, [recipeId, isAuthenticated]);
-
-  async function checkIfFavorited() {
+  const checkIfFavorited = useCallback(async () => {
     try {
       const response = await favoritesAPI.getFavorites();
       const isFav = response.data.some(fav => fav.recipe_id === recipeId);
@@ -23,7 +17,13 @@ function FavoriteButton({ recipeId, onFavoriteChange }) {
     } catch (error) {
       console.error("Error checking favorite status:", error);
     }
-  }
+  }, [recipeId]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      checkIfFavorited();
+    }
+  }, [recipeId, isAuthenticated, checkIfFavorited]);
 
   async function handleToggleFavorite() {
     if (!isAuthenticated) {

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, Badge, Button } from "react-bootstrap";
-import { FiEdit3, FiHeart } from "react-icons/fi";
+import { FiEdit3 } from "react-icons/fi";
 import MoodBadge from "./MoodBadge";
 import RecipeNotesModal from "../favorites/RecipeNotesModal";
 import FavoriteButton from './FavoriteButton';
@@ -17,13 +17,7 @@ function RecipeCard({
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [userNote, setUserNote] = useState("");
 
-  useEffect(() => {
-    if (isFavoritesPage) {
-      fetchUserNote();
-    }
-  }, [recipe.id, isFavoritesPage]);
-
-  const fetchUserNote = async () => {
+  const fetchUserNote = useCallback(async () => {
     try {
       const response = await notesAPI.getNotes(recipe.id);
       if (response.data.length > 0) {
@@ -32,7 +26,13 @@ function RecipeCard({
     } catch (error) {
       console.error("Error fetching note:", error);
     }
-  };
+  }, [recipe.id]);
+
+  useEffect(() => {
+    if (isFavoritesPage) {
+      fetchUserNote();
+    }
+  }, [recipe.id, isFavoritesPage, fetchUserNote]);
 
   const handleNoteSaved = (note) => {
     setUserNote(note);
@@ -111,7 +111,20 @@ function RecipeCard({
           {isCommunityRecipe && (
             <>
               <Card.Text className="recipe-creator" style={{ fontSize: "0.85rem" }}>
-                <strong>Created by:</strong> {creatorName}
+                <strong>Created by:</strong>{" "}
+                <span 
+                  className={recipe.created_by_username === "Anonymous" ? "text-muted" : ""}
+                  style={{ 
+                    fontStyle: recipe.created_by_username === "Anonymous" ? "italic" : "normal" 
+                  }}
+                >
+                  {creatorName}
+                </span>
+                {recipe.created_by_username === "Anonymous" && (
+                  <small className="text-muted d-block">
+                    (Account no longer active)
+                  </small>
+                )}
               </Card.Text>
 
               <div className="approval-status mb-2">

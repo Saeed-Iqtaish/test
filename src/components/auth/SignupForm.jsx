@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
 
-const LoginForm = ({ onSuccess, onSwitchToSignup }) => {
+const SignupForm = ({ onSuccess, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
+    username: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { login } = useAuth();
+  const { signup } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -24,7 +26,20 @@ const LoginForm = ({ onSuccess, onSwitchToSignup }) => {
     setLoading(true);
     setError('');
 
-    const result = await login(formData.email, formData.password);
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      setLoading(false);
+      return;
+    }
+
+    const result = await signup(formData.username, formData.email, formData.password);
     
     if (result.success) {
       onSuccess();
@@ -37,10 +52,22 @@ const LoginForm = ({ onSuccess, onSwitchToSignup }) => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <h3 className="text-center mb-4">Log In</h3>
+      <h3 className="text-center mb-4">Sign Up</h3>
       
       {error && <Alert variant="danger">{error}</Alert>}
       
+      <Form.Group className="mb-3">
+        <Form.Label>Username</Form.Label>
+        <Form.Control
+          type="text"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          placeholder="Choose a username"
+          required
+        />
+      </Form.Group>
+
       <Form.Group className="mb-3">
         <Form.Label>Email</Form.Label>
         <Form.Control
@@ -60,7 +87,22 @@ const LoginForm = ({ onSuccess, onSwitchToSignup }) => {
           name="password"
           value={formData.password}
           onChange={handleChange}
-          placeholder="Enter your password"
+          placeholder="Create a password"
+          required
+        />
+        <Form.Text className="text-muted">
+          Must be at least 8 characters long
+        </Form.Text>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Confirm Password</Form.Label>
+        <Form.Control
+          type="password"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          placeholder="Confirm your password"
           required
         />
       </Form.Group>
@@ -74,24 +116,26 @@ const LoginForm = ({ onSuccess, onSwitchToSignup }) => {
         {loading ? (
           <>
             <Spinner size="sm" className="me-2" />
-            Logging in...
+            Creating account...
           </>
         ) : (
-          'Log In'
+          'Sign Up'
         )}
       </Button>
 
       <div className="text-center">
-        <span className="text-muted">No account yet? </span>
+        <span className="text-muted">Already have an account? </span>
         <Button 
           variant="link" 
           className="p-0"
-          onClick={onSwitchToSignup}
+          onClick={onSwitchToLogin}
           disabled={loading}
         >
-          Sign Up
+          Log In
         </Button>
       </div>
     </Form>
   );
 };
+
+export default SignupForm;

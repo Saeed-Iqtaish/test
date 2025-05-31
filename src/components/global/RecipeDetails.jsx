@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Button, Badge, Alert, Spinner, Tab, Tabs } from "react-bootstrap";
 import { FiClock, FiUsers, FiUser, FiEdit3 } from "react-icons/fi";
 import axios from "axios";
@@ -18,17 +18,7 @@ function RecipeDetails({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (show && recipe) {
-      if (isCommunityRecipe) {
-        fetchCommunityRecipeDetails();
-      } else {
-        fetchSpoonacularRecipeDetails();
-      }
-    }
-  }, [show, recipe, isCommunityRecipe]);
-
-  const fetchSpoonacularRecipeDetails = async () => {
+  const fetchSpoonacularRecipeDetails = useCallback(async () => {
     if (!recipe?.id) return;
     
     setLoading(true);
@@ -47,9 +37,9 @@ function RecipeDetails({
     } finally {
       setLoading(false);
     }
-  };
+  }, [recipe?.id]);
 
-  const fetchCommunityRecipeDetails = async () => {
+  const fetchCommunityRecipeDetails = useCallback(async () => {
     if (!recipe?.id) return;
     
     setLoading(true);
@@ -68,7 +58,17 @@ function RecipeDetails({
     } finally {
       setLoading(false);
     }
-  };
+  }, [recipe?.id]);
+
+  useEffect(() => {
+    if (show && recipe) {
+      if (isCommunityRecipe) {
+        fetchCommunityRecipeDetails();
+      } else {
+        fetchSpoonacularRecipeDetails();
+      }
+    }
+  }, [show, recipe, isCommunityRecipe, fetchCommunityRecipeDetails, fetchSpoonacularRecipeDetails]);
 
   const formatTime = (minutes) => {
     if (!minutes) return 'N/A';
