@@ -63,12 +63,107 @@
   transform: none !important;
 }
 
+.admin-recipe-card {
+  border: 2px solid #e9ecef !important;
+  transition: all 0.3s ease !important;
+}
+
+.admin-recipe-card:hover {
+  border-color: #6f42c1 !important;
+  box-shadow: 0 8px 25px rgba(111, 66, 193, 0.15) !important;
+}
+
+.admin-recipe-card .pending-badge {
+  font-size: 0.7rem !important;
+  padding: 0.3rem 0.6rem !important;
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+}
+
+.admin-recipe-card .meta-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.admin-recipe-card .meta-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Admin approval buttons */
+.admin-recipe-card .btn-success {
+  font-size: 0.75rem !important;
+  padding: 0.4rem 0.8rem !important;
+  font-weight: 500 !important;
+}
+
+.admin-recipe-card .btn-danger {
+  font-size: 0.75rem !important;
+  padding: 0.4rem 0.8rem !important;
+  font-weight: 500 !important;
+}
+
+/* Admin review section in modal */
+.admin-review-section .approval-checklist {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #495057;
+}
+
+.admin-review-section .approval-checklist li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.admin-review-section .recipe-stats {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.admin-review-section .stat-item {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.admin-review-section .stat-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Admin button hover effects */
+.admin-review-section .btn-success:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4) !important;
+}
+
+.admin-review-section .btn-danger:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+}
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .filter-button {
     padding: 10px 20px;
     font-size: 0.95rem;
+  }
+
+    .admin-recipe-card .d-flex.gap-1 {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  .admin-recipe-card .btn {
+    width: 100% !important;
+  }
+  
+  .admin-review-section .admin-actions .btn {
+    font-size: 1rem !important;
+    padding: 0.75rem 1.25rem !important;
   }
   
   .load-more-btn {

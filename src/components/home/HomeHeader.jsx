@@ -7,39 +7,30 @@ function HomeHeader() {
   const { user, isAuthenticated } = useAuth();
 
   return (
-    <div className="enhanced-home-header">
-      <div className="header-content">
-        <div className="header-main">
-          <h1 className="header-title">
-            {isAuthenticated ? `Welcome back, ${user?.username}!` : "Discover Recipes"}
-          </h1>
-          <p className="header-subtitle">
-            {isAuthenticated 
-              ? "Find the perfect recipe to match your mood and dietary preferences"
-              : "Find the perfect recipe to match your mood and dietary preferences"
-            }
-          </p>
-        </div>
-        
-        {isAuthenticated && user?.allergies && user.allergies.length > 0 && (
-          <div className="user-allergies-info">
-            <div className="allergies-indicator">
-              <span className="allergies-icon">🛡️</span>
-              <div className="allergies-text">
-                <small className="allergies-label">Auto-filtering:</small>
-                <div className="allergies-list">
-                  {user.allergies.map((allergy, index) => (
-                    <span key={allergy} className="allergy-badge">
-                      {allergy}
-                      {index < user.allergies.length - 1 && ", "}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+    <div className="page-header">
+      <div className="text-center">
+        <h1 className="page-title">
+          {isAuthenticated ? `Welcome back, ${user?.username}!` : "Discover Your Perfect Recipe"}
+        </h1>
+        <p className="page-subtitle">
+          {isAuthenticated 
+            ? "Find recipes that match your mood and dietary preferences"
+            : "Search thousands of recipes tailored to your mood and dietary needs"
+          }
+        </p>
       </div>
+
+      {/* Show user allergy info if they have allergies set */}
+      {isAuthenticated && user?.allergies && user.allergies.length > 0 && (
+        <div className="mt-3 text-center">
+          <div className="d-inline-flex align-items-center bg-white bg-opacity-25 rounded-pill px-3 py-2">
+            <span className="me-2">🛡️</span>
+            <small className="text-white">
+              <strong>Auto-filtering:</strong> {user.allergies.join(', ')}
+            </small>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

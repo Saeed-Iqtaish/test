@@ -1,12 +1,12 @@
 import React from "react";
 import { Container } from "react-bootstrap";
-import EnhancedHomeHeader from "./components/home/EnhancedHomeHeader";
+import HomeHeader from "./components/home/HomeHeader";
 import SearchFilterControls from "./components/global/SearchFilterControls";
 import RecipeList from "./components/global/RecipeList";
 import RecipeDetails from "./components/global/RecipeDetails";
 import FilterModal from "./components/filterPanel/FilterModal";
 import { AuthModal } from "./components/auth/AuthModal";
-import useRecipeFilters from "./hooks/useRecipeFilters";
+import useRecipeFilters from "./hooks/useRecipeFilters .js";
 import useHomeModals from "./hooks/useHomeModals";
 import useRecipeInteractions from "./hooks/useRecipeInteractions";
 import "./styles/global/global.css";
@@ -55,7 +55,7 @@ function Home() {
     <>
       <Container fluid className="px-3 px-md-5">
         {/* Enhanced Page Header */}
-        <EnhancedHomeHeader />
+        <HomeHeader />
         
         {/* Search and Filter Controls */}
         <SearchFilterControls

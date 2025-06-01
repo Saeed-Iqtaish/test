@@ -86,6 +86,9 @@ export const communityAPI = {
   getRecipes: () => axios.get(`${API_BASE_URL}/community`),
   getRecipe: (id) => axios.get(`${API_BASE_URL}/community/${id}`),
   getPendingRecipes: () => api.get('/community/admin/pending'),
+  
+  getAdminRecipe: (id) => api.get(`/community/admin/recipe/${id}`),
+  
   createRecipe: (formData) => api.post('/community', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),

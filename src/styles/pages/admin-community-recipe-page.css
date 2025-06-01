@@ -1,0 +1,226 @@
+/* src/styles/pages/admin-community-recipe-page.css */
+.admin-recipe-review-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Admin Navigation */
+.admin-nav .btn {
+  border-radius: 25px !important;
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2) !important;
+}
+
+.admin-nav .btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3) !important;
+}
+
+/* Admin Review Header */
+.admin-review-header .alert {
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 193, 7, 0.3) !important;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 171, 0, 0.1) 100%) !important;
+  color: #856404 !important;
+  padding: 1.25rem 1.5rem !important;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1) !important;
+}
+
+.admin-review-header .alert strong {
+  color: #856404 !important;
+  font-weight: 600 !important;
+}
+
+.admin-review-header .alert .small {
+  color: #856404 !important;
+  opacity: 0.9 !important;
+  margin-top: 0.25rem !important;
+}
+
+/* Recipe Content Layout */
+.recipe-left-column {
+  padding-right: 2rem;
+}
+
+.recipe-content-column {
+  padding-left: 2rem;
+  border-left: 2px solid #e9ecef;
+}
+
+/* Enhanced Recipe Header for Admin Review */
+.admin-recipe-review-page .recipe-header-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid rgba(255, 193, 7, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 16px rgba(255, 193, 7, 0.1);
+  position: relative;
+}
+
+.admin-recipe-review-page .recipe-header-section::before {
+  content: '👀 ADMIN REVIEW';
+  position: absolute;
+  top: -12px;
+  left: 2rem;
+  background: linear-gradient(135deg, #ffc107 0%, #ffab00 100%);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+}
+
+/* Recipe Image Enhancement for Admin Review */
+.admin-recipe-review-page .recipe-image {
+  border: 3px solid rgba(255, 193, 7, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.admin-recipe-review-page .recipe-image:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 193, 7, 0.5);
+}
+
+/* Ingredients and Instructions Enhancement */
+.admin-recipe-review-page .ingredients-section,
+.admin-recipe-review-page .instructions-section {
+  background: rgba(248, 249, 250, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(233, 236, 239, 0.5);
+}
+
+.admin-recipe-review-page .ingredient-item,
+.admin-recipe-review-page .instruction-step {
+  background: white;
+  border: 1px solid rgba(233, 236, 239, 0.8);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.admin-recipe-review-page .ingredient-item:hover,
+.admin-recipe-review-page .instruction-step:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transform: translateX(2px);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 992px) {
+  .recipe-left-column {
+    padding-right: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .recipe-content-column {
+    padding-left: 1rem;
+    border-left: none;
+    border-top: 2px solid #e9ecef;
+    padding-top: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-recipe-review-page {
+    padding: 1rem;
+  }
+  
+  .admin-review-header .alert {
+    padding: 1rem !important;
+  }
+  
+  .admin-review-header .alert .d-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+  
+  .admin-nav .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .admin-recipe-review-page .recipe-header-section {
+    padding: 1.5rem;
+  }
+  
+  .admin-recipe-review-page .recipe-header-section::before {
+    left: 1.5rem;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .admin-recipe-review-page .recipe-header-section {
+    padding: 1rem;
+  }
+  
+  .admin-recipe-review-page .recipe-header-section::before {
+    left: 1rem;
+    top: -10px;
+  }
+  
+  .admin-recipe-review-page .ingredients-section,
+  .admin-recipe-review-page .instructions-section {
+    padding: 1rem;
+  }
+  
+  .admin-recipe-review-page .ingredient-item,
+  .admin-recipe-review-page .instruction-step {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Loading and Animation States */
+.admin-recipe-review-page .card,
+.admin-recipe-review-page .recipe-header-section,
+.admin-recipe-review-page .ingredient-item,
+.admin-recipe-review-page .instruction-step {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Success/Error States */
+.admin-recipe-review-page .alert-success {
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(32, 201, 151, 0.1) 100%) !important;
+  border: 1px solid rgba(40, 167, 69, 0.2) !important;
+  color: #155724 !important;
+}
+
+.admin-recipe-review-page .alert-danger {
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(200, 35, 51, 0.1) 100%) !important;
+  border: 1px solid rgba(220, 53, 69, 0.2) !important;
+  color: #721c24 !important;
+}
+
+/* Focus states for accessibility */
+.admin-recipe-review-page button:focus,
+.admin-recipe-review-page .btn:focus {
+  outline: 2px solid #ffc107 !important;
+  outline-offset: 2px !important;
+}
