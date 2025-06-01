@@ -110,7 +110,6 @@ function RecipePage() {
         mood={recipe.mood}
       />
 
-      {/* Recipe content will be added here when RecipeHeader is completed */}
       <div className="mt-4">
         <p className="text-muted">Recipe details will be displayed here...</p>
         <small>Ready in: {recipe.readyInMinutes} minutes | Servings: {recipe.servings}</small>

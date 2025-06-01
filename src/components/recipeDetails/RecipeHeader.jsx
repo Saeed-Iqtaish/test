@@ -3,11 +3,9 @@ import { Badge } from "react-bootstrap";
 import MoodBadge from '../global/MoodBadge';
 
 function RecipeHeader({ title, image, mood, isCommunityRecipe, approved, isModal = false, recipe }) {
-  // Helper function to get the correct image URL
   const getImageUrl = () => {
-    if (image) return image; // If image prop is provided, use it
+    if (image) return image; 
     
-    // For community recipes, construct the API URL
     if (isCommunityRecipe && recipe?.image_data) {
       return `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image`;
     }
@@ -15,7 +13,6 @@ function RecipeHeader({ title, image, mood, isCommunityRecipe, approved, isModal
     return null;
   };
 
-  // If this is being used in a modal, render differently
   if (isModal) {
     return (
       <div className="d-flex align-items-center gap-3 flex-wrap">
@@ -37,7 +34,6 @@ function RecipeHeader({ title, image, mood, isCommunityRecipe, approved, isModal
     );
   }
 
-  // Original implementation for full recipe pages
   const imageUrl = getImageUrl();
 
   return (

@@ -1,27 +1,18 @@
 import React, { useState } from 'react';
 import { Container, Card, Tabs, Tab } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext';
-
-// Custom hook
-import useUserProfile from '../hooks/useUserProfile .js';  // ✅ Correct path
-
-// Account components
+import useUserProfile from '../hooks/useUserProfile .js'; 
 import ProfileSettingsForm from '../components/account/settings/ProfileSettingsForm';
 import DietaryRestrictionsCard from '../components/account/settings/DietaryRestrictionsCard';
 import AccountInfoCard from '../components/account/settings/AccountInfoCard';
-import MyRecipes from '../components/account/recipes/MyRecipes';  // ✅ Updated path
-
-// Auth components
+import MyRecipes from '../components/account/recipes/MyRecipes'; 
 import { AuthModal } from '../components/auth/AuthModal';
-
-// Styles
 import '../styles/pages/account-page.css';
 
 const AccountPage = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   
-  // Use custom hook for profile management
   const {
     formData,
     editMode,
@@ -36,7 +27,6 @@ const AccountPage = () => {
     handleEditMode
   } = useUserProfile();
 
-  // Loading state
   if (isLoading || loading) {
     return (
       <Container className="text-center py-5">
@@ -47,7 +37,6 @@ const AccountPage = () => {
     );
   }
 
-  // Not authenticated state
   if (!isAuthenticated) {
     return (
       <>
@@ -84,9 +73,7 @@ const AccountPage = () => {
             <Card.Body>
               <Tabs defaultActiveKey="settings" className="account-tabs mb-4">
                 
-                {/* Settings Tab */}
                 <Tab eventKey="settings" title="Settings">
-                  {/* Profile Settings Form */}
                   <ProfileSettingsForm
                     formData={formData}
                     editMode={editMode}
@@ -99,21 +86,18 @@ const AccountPage = () => {
                     message={message}
                   />
 
-                  {/* Dietary Restrictions */}
                   <DietaryRestrictionsCard
                     allergies={formData.allergies}
                     editMode={editMode}
                     onAllergyChange={handleAllergyChange}
                   />
 
-                  {/* Account Information */}
                   <AccountInfoCard
                     user={user}
                     allergies={formData.allergies}
                   />
                 </Tab>
 
-                {/* My Recipes Tab */}
                 <Tab eventKey="my-recipes" title="My Recipes">
                   <MyRecipes />
                 </Tab>

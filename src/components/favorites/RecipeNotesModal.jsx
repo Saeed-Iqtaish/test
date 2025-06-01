@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Button, Alert } from "react-bootstrap";
 import { notesAPI } from "../../services/api";
-//import "../../styles/favorites/recipe-notes-modal.css";
 
 function RecipeNotesModal({ show, onHide, recipe, currentNote, onNoteSaved }) {
   const [note, setNote] = useState("");

@@ -1,7 +1,6 @@
 import React from "react";
 import { FiFilter } from "react-icons/fi";
 import SearchBar from "../global/SearchBar";
-//import "../../styles/favorites/favorites-controls.css";
 
 function FavoritesControls({ 
   searchTerm, 

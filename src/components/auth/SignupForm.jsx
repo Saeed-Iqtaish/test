@@ -26,7 +26,6 @@ const SignupForm = ({ onSuccess, onSwitchToLogin }) => {
     setLoading(true);
     setError('');
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);

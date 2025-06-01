@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "../components/auth/AuthModal";
 import FavoritesHeader from "../components/favorites/FavoritesHeader";
-import SearchFilterControls from "../components/global/SearchFilterControls"; // New reusable component
+import SearchFilterControls from "../components/global/SearchFilterControls";
 import FilterModal from "../components/filterPanel/FilterModal";
 import RecipeList from "../components/global/RecipeList";
 import RecipeDetails from "../components/global/RecipeDetails";
@@ -25,7 +25,6 @@ function FavoritesPage() {
   });
   const [appliedFilters, setAppliedFilters] = useState({ ...filters });
 
-  // Debounce for live search
   useEffect(() => {
     const delay = setTimeout(() => {
       setAppliedFilters((prev) => ({
@@ -51,7 +50,6 @@ function FavoritesPage() {
     setAppliedFilters(cleared);
   };
 
-  // Calculate active filter count
   const getActiveFilterCount = () => {
     let count = 0;
     if (filters.mood.length > 0) count += filters.mood.length;
@@ -121,7 +119,6 @@ function FavoritesPage() {
       <Container fluid className="px-3 px-md-5">
         <FavoritesHeader />
 
-        {/* Using the new reusable SearchFilterControls component */}
         <SearchFilterControls
           searchTerm={filters.search}
           setSearchTerm={(val) => updateFilter("search", val)}
@@ -144,7 +141,6 @@ function FavoritesPage() {
         </div>
       </Container>
 
-      {/* Recipe Details Modal for Favorites */}
       <RecipeDetails
         show={showRecipeDetails}
         onHide={handleRecipeDetailsClose}
@@ -154,7 +150,6 @@ function FavoritesPage() {
         onViewFullRecipe={handleViewFullRecipe}
       />
 
-      {/* Filter Modal */}
       <FilterModal
         show={showFilters}
         onHide={() => setShowFilters(false)}

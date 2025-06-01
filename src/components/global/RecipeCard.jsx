@@ -19,7 +19,6 @@ function RecipeCard({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [userNote, setUserNote] = useState("");
 
-  // Determine if this is a community recipe (could be from props or recipe data)
   const isActuallyCommunityRecipe = isCommunityRecipe || recipe.isCommunityRecipe || false;
 
   const fetchUserNote = useCallback(async () => {
@@ -50,11 +49,9 @@ function RecipeCard({
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
-    // The favorite button will automatically update when auth state changes
   };
 
   const title = recipe.title;
-  // Fixed: More robust API URL construction with fallback
   const image = isActuallyCommunityRecipe
     ? (recipe.image_data ? `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image` : null)
     : recipe.image;
@@ -84,15 +81,10 @@ function RecipeCard({
   };
 
   const showFavoriteButton = () => {
-    // Always show favorite button to allow users to favorite any recipe
     return true;
   };
 
-  // Determine if card should be clickable
   const isClickable = () => {
-    // Make cards clickable when:
-    // 1. onClick handler is provided (Home page for API recipes, Community page for community recipes)
-    // 2. On favorites page (both types should open modal)
     return onClick !== undefined;
   };
 
@@ -112,7 +104,6 @@ function RecipeCard({
             style={{ objectFit: "cover", height: "200px" }}
             onError={(e) => {
               console.error('Error loading recipe card image:', e.target.src);
-              // Hide the image on error but keep the placeholder
               e.target.style.display = 'none';
             }}
           />
@@ -165,9 +156,8 @@ function RecipeCard({
                 </small>
               </div>
             </>
-          )}
+          )};
 
-          {/* Favorites Page Content */}
           {isFavoritesPage && (
             <>
               <Card.Text className="recipe-description text-muted">
@@ -181,7 +171,6 @@ function RecipeCard({
                 <strong>Prep Time:</strong> {prepTime} • <strong>Servings:</strong> {servings}
               </Card.Text>
 
-              {/* Show diet badges only for Spoonacular recipes */}
               {!isActuallyCommunityRecipe && (
                 <div className="mb-3">
                   {recipe.diets?.slice(0, 2).map((diet) => (
@@ -192,7 +181,6 @@ function RecipeCard({
                 </div>
               )}
 
-              {/* Show recipe type badge on favorites page */}
               <div className="mb-3">
                 <Badge bg={isActuallyCommunityRecipe ? "info" : "primary"} className="me-1">
                   {isActuallyCommunityRecipe ? "Community Recipe" : "Spoonacular Recipe"}
@@ -225,7 +213,6 @@ function RecipeCard({
             </>
           )}
 
-          {/* Regular Recipe Content (Home page) */}
           {!isActuallyCommunityRecipe && !isFavoritesPage && (
             <>
               <Card.Text className="text-muted" style={{ fontSize: "0.85rem" }}>
@@ -246,14 +233,12 @@ function RecipeCard({
         </Card.Body>
       </Card>
 
-      {/* Auth Modal for login prompt */}
       <AuthModal
         show={showAuthModal}
         onHide={() => setShowAuthModal(false)}
         onSuccess={handleAuthSuccess}
       />
 
-      {/* Notes Modal for Favorites Page */}
       {isFavoritesPage && (
         <RecipeNotesModal
           show={showNotesModal}

@@ -1,3 +1,4 @@
+/* Updated search-filter-controls.css - Keep search and filter side by side */
 .search-filter-controls {
   display: flex;
   width: 100%;
@@ -25,7 +26,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* Changed from wrap to nowrap to keep items side by side */
 }
 
 /* Filter Button Styles */
@@ -45,6 +46,7 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   white-space: nowrap;
   min-width: fit-content;
+  flex-shrink: 0; /* Prevent the button from shrinking */
 }
 
 .filter-button:hover {
@@ -71,7 +73,14 @@
   line-height: 1 !important;
 }
 
-/* Mobile responsiveness */
+/* Search container adjustments */
+.search-filter-group .search-container {
+  flex: 1; /* Allow search to take remaining space */
+  min-width: 200px; /* Minimum width for search */
+  max-width: 350px; /* Maximum width for search */
+}
+
+/* Mobile responsiveness - keep side by side but make adjustments */
 @media (max-width: 768px) {
   .search-filter-controls {
     margin-bottom: 1rem;
@@ -79,9 +88,29 @@
 
   .search-filter-controls.align-right,
   .search-filter-controls.align-between {
-    justify-content: center;
+    justify-content: flex-end; /* Keep right alignment even on mobile */
   }
   
+  .search-filter-group {
+    gap: 0.75rem; /* Reduce gap slightly on mobile */
+    flex-wrap: nowrap; /* Still keep side by side */
+  }
+  
+  .filter-button {
+    padding: 10px 18px; /* Slightly smaller padding */
+    font-size: 0.95rem;
+    min-width: auto; /* Allow some compression */
+  }
+
+  /* Adjust search container for mobile */
+  .search-filter-group .search-container {
+    min-width: 150px; /* Smaller minimum on mobile */
+    max-width: 250px; /* Smaller maximum on mobile */
+  }
+}
+
+/* Very small screens - only then consider stacking if absolutely necessary */
+@media (max-width: 480px) {
   .search-filter-group {
     flex-direction: column;
     gap: 0.75rem;
@@ -90,28 +119,33 @@
   }
   
   .filter-button {
-    padding: 10px 20px;
-    font-size: 0.95rem;
     justify-content: center;
     width: 100%;
     max-width: 300px;
     margin: 0 auto;
   }
 
-  /* Make search bar full width on mobile */
+  /* Make search bar full width on very small screens */
   .search-filter-group .search-container {
     width: 100%;
     max-width: 100%;
+    min-width: auto;
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 576px) and (min-width: 481px) {
+  /* Keep side by side for most mobile screens */
   .search-filter-group {
     gap: 0.5rem;
   }
   
   .filter-button {
-    padding: 8px 16px;
+    padding: 8px 14px;
     font-size: 0.9rem;
+  }
+  
+  .search-filter-group .search-container {
+    min-width: 140px;
+    max-width: 200px;
   }
 }

@@ -12,7 +12,7 @@ import CreateRecipeModal from "../components/community/list/CreateRecipeModal";
 import "../styles/global/global.css";
 
 function CommunityPage() {
-  const { user, isAuthenticated } = useAuth(); // Added user here
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
   const [showFilters, setShowFilters] = useState(false);
@@ -68,7 +68,6 @@ function CommunityPage() {
     setShowCreateModal(true);
   }
 
-  // Updated to show modal first instead of navigating directly
   function handleRecipeClick(recipe) {
     setSelectedRecipe(recipe);
     setShowRecipeDetails(true);
@@ -80,7 +79,6 @@ function CommunityPage() {
   }
 
   function handleViewFullRecipe(recipe) {
-    // Navigate to the full community recipe page from modal
     navigate(`/community/${recipe.id}`);
     setShowRecipeDetails(false);
   }
@@ -116,7 +114,6 @@ function CommunityPage() {
         </div>
       </Container>
 
-      {/* Recipe Details Modal for Community Recipes */}
       <RecipeDetails
         show={showRecipeDetails}
         onHide={handleRecipeDetailsClose}
@@ -126,7 +123,6 @@ function CommunityPage() {
         onViewFullRecipe={handleViewFullRecipe}
       />
 
-      {/* Filter Modal */}
       <FilterModal
         show={showFilters}
         onHide={() => setShowFilters(false)}

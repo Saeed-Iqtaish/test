@@ -17,69 +17,61 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
   const [error, setError] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Reset and populate form when modal opens with recipe data
   useEffect(() => {
     if (show && recipe && recipe.id) {
       console.log('🔄 Populating edit form with recipe:', recipe);
       populateFormData(recipe);
       setIsInitialized(true);
     } else if (!show) {
-      // Reset form when modal closes
       resetForm();
       setIsInitialized(false);
     }
   }, [show, recipe]);
 
   const populateFormData = (recipeData) => {
-    // Set basic form data
     setFormData({
       title: recipeData.title || "",
       prepTime: recipeData.prep_time?.toString() || "",
       servings: recipeData.servings?.toString() || "",
-      image: null // Always null for file input
+      image: null
     });
 
-    // Handle ingredients - they might be in different formats
     if (recipeData.ingredients && Array.isArray(recipeData.ingredients)) {
       const ingredientsList = recipeData.ingredients.map(ingredient => {
-        // Handle both object format {ingredient: "..."} and string format
         if (typeof ingredient === 'object' && ingredient.ingredient) {
           return ingredient.ingredient;
         }
         return ingredient.toString();
-      }).filter(ing => ing && ing.trim()); // Remove empty items
-      
+      }).filter(ing => ing && ing.trim());
+
       setIngredients(ingredientsList.length > 0 ? ingredientsList : [""]);
       console.log('📋 Populated ingredients:', ingredientsList);
     } else {
       setIngredients([""]);
     }
 
-    // Handle instructions - they might be in different formats
     if (recipeData.instructions && Array.isArray(recipeData.instructions)) {
       const instructionsList = recipeData.instructions
         .sort((a, b) => {
-          // Sort by step_number if available
           if (a.step_number && b.step_number) {
             return a.step_number - b.step_number;
           }
           return 0;
         })
         .map(instruction => {
-          // Handle both object format {instruction: "..."} and string format
           if (typeof instruction === 'object' && instruction.instruction) {
             return instruction.instruction;
           }
           return instruction.toString();
-        }).filter(inst => inst && inst.trim()); // Remove empty items
-      
+        }).filter(inst => inst && inst.trim());
+
       setInstructions(instructionsList.length > 0 ? instructionsList : [""]);
       console.log('📖 Populated instructions:', instructionsList);
     } else {
       setInstructions([""]);
     }
 
-    setError(""); // Clear any previous errors
+    setError("");
   };
 
   const resetForm = () => {
@@ -114,11 +106,10 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!recipe?.id) return;
-    
+
     setLoading(true);
     setError("");
 
-    // Validation
     if (!formData.title.trim()) {
       setError("Recipe title is required");
       setLoading(false);
@@ -159,14 +150,14 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
       submitData.append("servings", parseInt(formData.servings));
       submitData.append("ingredients", JSON.stringify(validIngredients));
       submitData.append("instructions", JSON.stringify(validInstructions));
-      
+
       if (formData.image) {
         submitData.append("image", formData.image);
       }
 
       console.log('🔄 Updating recipe with ID:', recipe.id);
       await communityAPI.updateRecipe(recipe.id, submitData);
-      
+
       console.log('✅ Recipe updated successfully!');
       onRecipeUpdated();
       onHide();
@@ -183,7 +174,6 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
     onHide();
   };
 
-  // Show loading state while form is being populated
   if (show && !isInitialized && recipe) {
     return (
       <Modal show={show} onHide={handleClose} size="lg" className="edit-recipe-modal">
@@ -199,8 +189,8 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
   }
 
   return (
-    <Modal 
-      show={show} 
+    <Modal
+      show={show}
       onHide={handleClose}
       size="lg"
       className="edit-recipe-modal"
@@ -208,11 +198,11 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
       <Modal.Header closeButton>
         <Modal.Title>Edit Recipe: {formData.title || 'Loading...'}</Modal.Title>
       </Modal.Header>
-      
+
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
           {error && <Alert variant="danger">{error}</Alert>}
-          
+
           <Form.Group className="mb-3">
             <Form.Label>Recipe Title *</Form.Label>
             <Form.Control
@@ -304,7 +294,7 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
             </details>
           )}
         </Modal.Body>
-        
+
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose} disabled={loading}>
             Cancel

@@ -32,14 +32,6 @@
   font-size: 1.1rem;
 }
 
-/* Right-aligned controls container */
-.controls-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-left: auto;
-}
-
 /* Load More Button Styles */
 .load-more-btn {
   border-radius: 25px !important;
@@ -152,7 +144,7 @@
     font-size: 0.95rem;
   }
 
-    .admin-recipe-card .d-flex.gap-1 {
+  .admin-recipe-card .d-flex.gap-1 {
     flex-direction: column !important;
     gap: 0.5rem !important;
   }
@@ -169,19 +161,5 @@
   .load-more-btn {
     width: 100% !important;
     max-width: 300px !important;
-  }
-  .controls-right {
-    flex-direction: column;
-    gap: 0.75rem;
-    width: 100%;
-    align-items: stretch;
-  }
-  
-  .controls-right .search-container {
-    max-width: 100%;
-  }
-  
-  .controls-right .filter-button {
-    justify-content: center;
   }
 }

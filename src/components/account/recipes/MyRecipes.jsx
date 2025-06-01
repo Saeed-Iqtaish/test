@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Spinner, Alert, Button, Card } from 'react-bootstrap';
 import { FiEdit3, FiTrash2, FiEye } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { userAPI, communityAPI } from '../../../services/api';  // ✅ Fixed: 3 levels up
-import EditRecipeModal from '../../community/shared/EditRecipeModal';  // ✅ Fixed: 2 levels up
-import MoodBadge from '../../global/MoodBadge';  // ✅ Fixed: 2 levels up
+import { userAPI, communityAPI } from '../../../services/api';
+import EditRecipeModal from '../../community/shared/EditRecipeModal'; 
+import MoodBadge from '../../global/MoodBadge'; 
 
 function MyRecipes() {
     const [recipes, setRecipes] = useState([]);
@@ -16,14 +16,12 @@ function MyRecipes() {
 
     const navigate = useNavigate();
 
-    // Use useCallback to memoize the function to fix the dependency warning
     const fetchMyRecipes = useCallback(async () => {
         try {
             setLoading(true);
             setError('');
             const response = await userAPI.getMyRecipes();
 
-            // Add mood assignment to recipes
             const recipesWithMood = response.data.map(recipe => ({
                 ...recipe,
                 mood: assignMood(recipe)
@@ -36,7 +34,7 @@ function MyRecipes() {
         } finally {
             setLoading(false);
         }
-    }, []); // Empty dependency array since it doesn't depend on any props or state
+    }, []);
 
     const assignMood = (recipe) => {
         const text = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
@@ -56,10 +54,9 @@ function MyRecipes() {
 
     useEffect(() => {
         fetchMyRecipes();
-    }, [fetchMyRecipes]); // Now fetchMyRecipes is properly memoized
+    }, [fetchMyRecipes]);
 
     const handleEdit = (recipe) => {
-        // Debug: Log the recipe data structure before editing
         console.log('🔍 Recipe data being passed to edit modal:', {
             id: recipe.id,
             title: recipe.title,
@@ -70,7 +67,6 @@ function MyRecipes() {
             hasImage: !!recipe.image_data
         });
 
-        // Check if we need to fetch detailed recipe data
         if (!recipe.ingredients || !recipe.instructions) {
             console.log('⚠️ Recipe missing ingredients/instructions, fetching full data...');
             fetchFullRecipeData(recipe.id);
@@ -104,7 +100,7 @@ function MyRecipes() {
     const handleRecipeUpdated = () => {
         setShowEditModal(false);
         setSelectedRecipe(null);
-        fetchMyRecipes(); // Refresh the list
+        fetchMyRecipes();
     };
 
     const fetchFullRecipeData = async (recipeId) => {
@@ -240,7 +236,6 @@ function MyRecipes() {
                 ))}
             </Row>
 
-            {/* Edit Recipe Modal */}
             <EditRecipeModal
                 show={showEditModal}
                 onHide={() => setShowEditModal(false)}

@@ -89,7 +89,6 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
 
             console.log('✅ Recipe submitted successfully!');
 
-            // Reset form
             setFormData({
                 title: "",
                 prepTime: "",

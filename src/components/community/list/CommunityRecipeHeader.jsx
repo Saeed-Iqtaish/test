@@ -12,7 +12,6 @@ function CommunityRecipeHeader({
   const { user, isAuthenticated } = useAuth();
 
   const canSeeStatus = () => {
-    // Only show status to recipe creator
     return isAuthenticated && user?.id === recipe?.created_by;
   };
 

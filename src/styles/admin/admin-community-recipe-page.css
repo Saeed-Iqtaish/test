@@ -1,172 +1,269 @@
-/* src/styles/admin/admin-approval-controls.css */
-.admin-approval-controls {
-  border: none !important;
-  border-radius: 16px !important;
-  box-shadow: 0 8px 32px rgba(220, 53, 69, 0.15) !important;
-  overflow: hidden !important;
-  position: sticky;
-  bottom: 2rem;
-  z-index: 10;
-  background: white;
-}
-
-.admin-controls-header {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-  border-bottom: none !important;
-  color: white !important;
-  padding: 1.25rem 1.5rem !important;
-}
-
-.admin-controls-header h6 {
-  color: white !important;
-  font-weight: 600 !important;
-  font-size: 1.1rem !important;
-}
-
-.admin-approval-controls .card-body {
-  padding: 2rem 1.5rem !important;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
-}
-
-.approval-info {
-  background: rgba(108, 117, 125, 0.05) !important;
-  border-radius: 8px !important;
-  padding: 1rem !important;
-  border: 1px solid rgba(108, 117, 125, 0.1) !important;
-}
-
-.approval-actions {
-  margin: 1.5rem 0 !important;
-}
-
-.approval-btn {
-  border-radius: 25px !important;
-  padding: 0.875rem 2.5rem !important;
-  font-weight: 600 !important;
-  font-size: 1.05rem !important;
-  transition: all 0.3s ease !important;
-  border: none !important;
-  position: relative !important;
-  overflow: hidden !important;
-  min-width: 180px !important;
-}
-
-.approve-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
-}
-
-.approve-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #218838 0%, #1ca085 100%) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4) !important;
-}
-
-.reject-btn {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
-}
-
-.reject-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4) !important;
-}
-
-.approval-btn:disabled {
-  opacity: 0.6 !important;
-  cursor: not-allowed !important;
-  transform: none !important;
-}
-
-.approval-btn:focus {
-  box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25) !important;
-}
-
-/* Button Loading Animation */
-.approval-btn .spinner-border-sm {
-  width: 1rem !important;
-  height: 1rem !important;
-}
-
-/* Admin Note Styling */
-.admin-note .alert {
-  border-radius: 10px !important;
-  border: 1px solid rgba(13, 110, 253, 0.2) !important;
-  background-color: rgba(13, 110, 253, 0.05) !important;
-  color: #0a58ca !important;
-  padding: 1rem 1.25rem !important;
-}
-
-/* Confirmation Modal Styling */
-.confirmation-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+/* src/styles/pages/admin-community-recipe-page.css */
+.admin-recipe-review-page {
+  max-width: 1400px;
   margin: 0 auto;
-  background: rgba(248, 249, 250, 0.8);
+  padding: 2rem 1rem;
 }
 
-/* Sticky positioning adjustments */
-@media (max-width: 1200px) {
-  .admin-approval-controls {
-    position: relative;
-    bottom: auto;
-  }
+/* Admin Navigation */
+.admin-nav .btn {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%) !important;
+  border: none !important;
+  color: white !important;
+  border-radius: 25px !important;
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3) !important;
+}
+
+.admin-nav .btn:hover {
+  background: linear-gradient(135deg, #FF5252 0%, #FF7A39 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4) !important;
+  color: white !important;
+}
+
+/* Admin Header - Match other page headers */
+.admin-header {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: white;
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+  margin-bottom: 2rem;
+}
+
+.admin-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-subtitle {
+  font-size: 1.2rem;
+  margin: 0.75rem 0 0 0;
+  opacity: 0.95;
+  font-weight: 400;
+}
+
+/* Admin Review Header - Match page header style */
+.admin-review-header .alert {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: white;
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+  margin-bottom: 2rem;
+  border: none;
+}
+
+.admin-review-header .alert strong {
+  color: white;
+  font-weight: 700;
+  font-size: 2.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.admin-review-header .alert .small {
+  color: white;
+  opacity: 0.95;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+/* Recipe Content Layout */
+.recipe-left-column {
+  padding-right: 2rem;
+}
+
+.recipe-content-column {
+  padding-left: 2rem;
+  border-left: 2px solid #e9ecef;
+}
+
+/* Enhanced Recipe Header for Admin Review */
+.admin-recipe-review-page .recipe-header-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid rgba(255, 107, 107, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.1);
+  position: relative;
+}
+
+.admin-recipe-review-page .recipe-header-section::before {
+  content: '👀 ADMIN REVIEW';
+  position: absolute;
+  top: -12px;
+  left: 2rem;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Recipe Image Enhancement for Admin Review */
+.admin-recipe-review-page .recipe-image {
+  border: 3px solid rgba(255, 107, 107, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.admin-recipe-review-page .recipe-image:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+/* Ingredients and Instructions Enhancement */
+.admin-recipe-review-page .ingredients-section,
+.admin-recipe-review-page .instructions-section {
+  background: rgba(248, 249, 250, 0.5);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(233, 236, 239, 0.5);
+}
+
+.admin-recipe-review-page .ingredient-item,
+.admin-recipe-review-page .instruction-step {
+  background: white;
+  border: 1px solid rgba(233, 236, 239, 0.8);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.admin-recipe-review-page .ingredient-item:hover,
+.admin-recipe-review-page .instruction-step:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transform: translateX(2px);
+}
+
+.admin-recipe-review-page .ingredient-item {
+  border-left: 4px solid #FF6B6B;
+}
+
+.admin-recipe-review-page .instruction-step {
+  border-left: 4px solid #28a745;
+}
+
+/* Admin Review Tabs Enhancement */
+.admin-recipe-review-page .nav-tabs .nav-link {
+  color: #495057 !important;
+  font-weight: 500 !important;
+  border: none !important;
+  border-bottom: 3px solid transparent !important;
+  border-radius: 0 !important;
+  padding: 0.75rem 1.25rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.admin-recipe-review-page .nav-tabs .nav-link:hover {
+  background: rgba(255, 107, 107, 0.05) !important;
+  color: #FF6B6B !important;
+  border-bottom-color: rgba(255, 107, 107, 0.3) !important;
+}
+
+.admin-recipe-review-page .nav-tabs .nav-link.active {
+  background: white !important;
+  color: #FF6B6B !important;
+  border-bottom-color: #FF6B6B !important;
+  font-weight: 600 !important;
 }
 
 /* Mobile Responsiveness */
+@media (max-width: 992px) {
+  .recipe-left-column {
+    padding-right: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .recipe-content-column {
+    padding-left: 1rem;
+    border-left: none;
+    border-top: 2px solid #e9ecef;
+    padding-top: 2rem;
+  }
+}
+
 @media (max-width: 768px) {
-  .admin-approval-controls .card-body {
-    padding: 1.5rem 1rem !important;
+  .admin-recipe-review-page {
+    padding: 1rem;
   }
   
-  .approval-actions .d-flex {
-    flex-direction: column !important;
-    gap: 1rem !important;
-  }
-  
-  .approval-btn {
-    width: 100% !important;
-    min-width: auto !important;
-    padding: 0.75rem 2rem !important;
-    font-size: 1rem !important;
-  }
-  
-  .admin-controls-header {
+  .admin-review-header .alert {
     padding: 1rem !important;
   }
   
-  .admin-controls-header h6 {
-    font-size: 1rem !important;
+  .admin-review-header .alert .d-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
   }
   
-  .approval-info .row .col-md-6 {
-    margin-bottom: 0.5rem;
+  .admin-nav .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .admin-recipe-review-page .recipe-header-section {
+    padding: 1.5rem;
+  }
+  
+  .admin-recipe-review-page .recipe-header-section::before {
+    left: 1.5rem;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
   }
 }
 
 @media (max-width: 576px) {
-  .admin-approval-controls {
-    margin-left: -1rem;
-    margin-right: -1rem;
-    border-radius: 0 !important;
+  .admin-recipe-review-page .recipe-header-section {
+    padding: 1rem;
   }
   
-  .approval-btn {
-    padding: 0.7rem 1.5rem !important;
-    font-size: 0.95rem !important;
+  .admin-recipe-review-page .recipe-header-section::before {
+    left: 1rem;
+    top: -10px;
+  }
+  
+  .admin-recipe-review-page .ingredients-section,
+  .admin-recipe-review-page .instructions-section {
+    padding: 1rem;
+  }
+  
+  .admin-recipe-review-page .ingredient-item,
+  .admin-recipe-review-page .instruction-step {
+    padding: 0.75rem 1rem;
   }
 }
 
-/* Animation for controls appearance */
-@keyframes slideUpFadeIn {
+/* Loading and Animation States */
+.admin-recipe-review-page .card,
+.admin-recipe-review-page .recipe-header-section,
+.admin-recipe-review-page .ingredient-item,
+.admin-recipe-review-page .instruction-step {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -174,20 +271,54 @@
   }
 }
 
-.admin-approval-controls {
-  animation: slideUpFadeIn 0.5s ease-out !important;
+/* Success/Error States */
+.admin-recipe-review-page .alert-success {
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(32, 201, 151, 0.1) 100%) !important;
+  border: 1px solid rgba(40, 167, 69, 0.2) !important;
+  color: #155724 !important;
 }
 
-/* Success/Error Alert Enhancements */
-.admin-approval-controls .alert-danger {
-  border-radius: 10px !important;
-  border: 1px solid rgba(220, 53, 69, 0.2) !important;
-  background-color: rgba(220, 53, 69, 0.05) !important;
+.admin-recipe-review-page .alert-danger {
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 142, 83, 0.1) 100%) !important;
+  border: 1px solid rgba(255, 107, 107, 0.2) !important;
   color: #721c24 !important;
-  padding: 1rem 1.25rem !important;
 }
 
-/* Hover effects for the entire control panel */
-.admin-approval-controls:hover {
-  box-shadow: 0 12px 40px rgba(220, 53, 69, 0.2) !important;
+/* Focus states for accessibility */
+.admin-recipe-review-page button:focus,
+.admin-recipe-review-page .btn:focus {
+  outline: 2px solid #FF6B6B !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25) !important;
+}
+
+/* Admin Recipe Card - Remove click hint */
+.admin-recipe-card .admin-hint,
+.admin-hint {
+  display: none !important;
+}
+
+.admin-recipe-review-page .recipe-title {
+  color: #2E2E2E !important;
+  font-weight: 700 !important;
+}
+
+.admin-recipe-review-page .recipe-meta {
+  color: #6c757d !important;
+}
+
+.admin-recipe-review-page .recipe-meta strong {
+  color: #495057 !important;
+}
+
+.admin-recipe-review-page .badge {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.admin-recipe-review-page .card:hover {
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.1) !important;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }

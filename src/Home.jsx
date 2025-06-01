@@ -45,7 +45,6 @@ function Home() {
     openAuthModal
   });
 
-  // Filter handlers
   const handleApplyFilters = () => {
     applyFilters();
     closeFilterModal();
@@ -54,10 +53,8 @@ function Home() {
   return (
     <>
       <Container fluid className="px-3 px-md-5">
-        {/* Enhanced Page Header */}
         <HomeHeader />
         
-        {/* Search and Filter Controls */}
         <SearchFilterControls
           searchTerm={filters.search}
           setSearchTerm={(val) => updateFilter("search", val)}
@@ -67,7 +64,6 @@ function Home() {
           alignment="right"
         />
 
-        {/* Recipe List */}
         <div className="mt-4">
           <RecipeList
             search={appliedFilters.search}
@@ -82,7 +78,6 @@ function Home() {
         </div>
       </Container>
 
-      {/* Recipe Details Modal */}
       <RecipeDetails
         show={showRecipeDetails}
         onHide={closeRecipeDetails}
@@ -91,13 +86,11 @@ function Home() {
         onFavoriteChange={handleFavoriteChange}
       />
 
-      {/* Filter Modal */}
       <FilterModal
         show={showFilterModal}
         onHide={closeFilterModal}
         filters={filters}
         setFilters={(newFilters) => {
-          // Update multiple filters at once
           Object.keys(newFilters).forEach(key => {
             if (filters[key] !== newFilters[key]) {
               updateFilter(key, newFilters[key]);
@@ -109,7 +102,6 @@ function Home() {
         userAllergies={userAllergies}
       />
 
-      {/* Auth Modal for login prompts */}
       <AuthModal
         show={showAuthModal}
         onHide={closeAuthModal}

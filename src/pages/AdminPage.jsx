@@ -12,7 +12,6 @@ function AdminPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Trigger refresh of pending recipes list
   const handleRecipeStatusChange = () => {
     setRefreshTrigger(prev => prev + 1);
   };
@@ -65,13 +64,10 @@ function AdminPage() {
 
   return (
     <Container className="py-4 admin-page">
-      {/* Admin Header */}
       <AdminHeader user={user} />
-      
-      {/* Admin Statistics */}
+
       <AdminStats refreshTrigger={refreshTrigger} />
-      
-      {/* Pending Recipes Section */}
+
       <AdminPendingRecipes 
         refreshTrigger={refreshTrigger}
         onRecipeStatusChange={handleRecipeStatusChange}

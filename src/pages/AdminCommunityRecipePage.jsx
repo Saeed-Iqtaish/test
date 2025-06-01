@@ -18,7 +18,6 @@ function AdminCommunityRecipePage() {
   const { user, isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Use the simplified hook to fetch admin recipe details
   const { recipe, loading, error } = useAdminCommunityRecipe(id);
 
   const handleBackToAdmin = () => {
@@ -26,7 +25,6 @@ function AdminCommunityRecipePage() {
   };
 
   const handleApprovalChange = useCallback((recipeId, approved) => {
-    // Show success message and navigate back
     const action = approved ? 'approved' : 'rejected';
     alert(`Recipe ${action} successfully!`);
     handleBackToAdmin();
@@ -44,7 +42,6 @@ function AdminCommunityRecipePage() {
     setShowAuthModal(false);
   };
 
-  // Check admin access
   if (!isAuthenticated || !user?.isAdmin) {
     return (
       <Container className="py-5">
@@ -59,7 +56,6 @@ function AdminCommunityRecipePage() {
     );
   }
 
-  // Loading state
   if (loading) {
     return (
       <Container className="text-center py-5">
@@ -69,7 +65,6 @@ function AdminCommunityRecipePage() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <Container className="py-5">
@@ -84,7 +79,6 @@ function AdminCommunityRecipePage() {
     );
   }
 
-  // Recipe not found
   if (!recipe) {
     return (
       <Container className="py-5">
@@ -101,7 +95,6 @@ function AdminCommunityRecipePage() {
 
   return (
     <Container className="py-4 admin-recipe-review-page">
-      {/* Admin Navigation */}
       <div className="admin-nav mb-4">
         <Button 
           variant="outline-primary"
@@ -112,7 +105,6 @@ function AdminCommunityRecipePage() {
         </Button>
       </div>
 
-      {/* Admin Review Header */}
       <div className="admin-review-header mb-4">
         <Alert variant="warning">
           <div className="d-flex align-items-center">
@@ -128,18 +120,15 @@ function AdminCommunityRecipePage() {
         </Alert>
       </div>
 
-      {/* Recipe Header */}
       <CommunityRecipeHeader
         recipe={recipe}
         onFavoriteChange={handleFavoriteChange}
         onLoginRequired={handleLoginRequired}
       />
 
-      {/* Recipe Meta Information */}
       <CommunityRecipeMeta recipe={recipe} />
 
       <div className="row">
-        {/* Left Column - Image */}
         <div className="col-lg-5 recipe-left-column">
           <CommunityRecipeImage 
             recipe={recipe} 
@@ -147,19 +136,16 @@ function AdminCommunityRecipePage() {
           />
         </div>
 
-        {/* Right Column - Ingredients and Instructions */}
         <div className="col-lg-7 recipe-content-column">
           <CommunityRecipeContent recipe={recipe} />
         </div>
       </div>
 
-      {/* Admin Approval Controls */}
       <AdminApprovalControls
         recipe={recipe}
         onApprovalChange={handleApprovalChange}
       />
 
-      {/* Auth Modal for login prompt */}
       <AuthModal
         show={showAuthModal}
         onHide={() => setShowAuthModal(false)}
@@ -169,7 +155,6 @@ function AdminCommunityRecipePage() {
   );
 }
 
-// Simplified hook using the new admin API endpoint
 function useAdminCommunityRecipe(id) {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -199,8 +184,7 @@ function useAdminCommunityRecipe(id) {
       setError('');
       
       console.log('Fetching admin recipe details for ID:', id);
-      
-      // Use the new admin API endpoint
+
       const response = await communityAPI.getAdminRecipe(id);
       const recipeData = response.data;
       

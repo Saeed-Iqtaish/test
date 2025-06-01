@@ -10,11 +10,10 @@ const diets = [
 
 function DietSelector({ selected = [], onSelect }) {
   function handleClick(diet) {
-    // Toggle off if already selected
     if (selected[0] === diet) {
       onSelect([]);
     } else {
-      onSelect([diet]); // Allow only one
+      onSelect([diet]);
     }
   }
 

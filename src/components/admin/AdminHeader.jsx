@@ -1,5 +1,4 @@
 import React from "react";
-//import "../../styles/admin/admin-header.css";
 
 function AdminHeader({ user }) {
   return (

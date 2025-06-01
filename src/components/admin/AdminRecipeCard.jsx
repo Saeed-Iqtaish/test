@@ -24,7 +24,6 @@ function AdminRecipeCard({ recipe, onClick }) {
     });
   };
 
-  // Get recipe image URL
   const getImageUrl = () => {
     if (recipe.image_data) {
       return `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image`;
@@ -60,7 +59,6 @@ function AdminRecipeCard({ recipe, onClick }) {
       )}
 
       <Card.Body className="d-flex flex-column">
-        {/* Status and Mood Badges */}
         <div className="d-flex justify-content-between mb-2 align-items-start">
           <MoodBadge mood={recipe.mood} />
           <Badge bg="warning" className="pending-badge">
@@ -68,12 +66,10 @@ function AdminRecipeCard({ recipe, onClick }) {
           </Badge>
         </div>
 
-        {/* Recipe Title */}
         <Card.Title as="h6" className="recipe-title">
           {recipe.title}
         </Card.Title>
 
-        {/* Recipe Meta Info */}
         <Card.Text className="text-muted recipe-meta">
           <small>
             <strong>Prep Time:</strong> {recipe.prep_time} mins •{' '}
@@ -81,7 +77,6 @@ function AdminRecipeCard({ recipe, onClick }) {
           </small>
         </Card.Text>
 
-        {/* Creator Info */}
         <div className="creator-info mb-2">
           <small className="text-muted">
             <strong>Created by:</strong>{' '}
@@ -91,18 +86,10 @@ function AdminRecipeCard({ recipe, onClick }) {
           </small>
         </div>
 
-        {/* Submission Date - Auto margin top to push to bottom */}
         <div className="submission-date mt-auto">
           <small className="text-muted">
             <strong>Submitted:</strong><br />
             {formatDate(recipe.created_at)}
-          </small>
-        </div>
-
-        {/* Admin Action Hint */}
-        <div className="admin-hint mt-2">
-          <small className="text-primary">
-            <em>👆 Click to review and approve</em>
           </small>
         </div>
       </Card.Body>

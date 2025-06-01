@@ -2,17 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Button, Spinner, Alert, Tabs, Tab, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
-
-// Import existing components
 import MoodBadge from "../global/MoodBadge";
 import RecipeIngredients from "../recipeDetails/RecipeIngredients";
 import RecipeInstructions from "../recipeDetails/RecipeInstructions";
 import RecipeNotes from "../recipeDetails/RecipeNotes";
 
-function RecipeDetails({ 
-  show, 
-  onHide, 
-  recipe, 
+function RecipeDetails({
+  show,
+  onHide,
+  recipe,
   isCommunityRecipe = false,
   onFavoriteChange,
   onViewFullRecipe
@@ -24,13 +22,13 @@ function RecipeDetails({
 
   const fetchSpoonacularRecipeDetails = useCallback(async () => {
     if (!recipe?.id) return;
-    
+
     setLoading(true);
     setError("");
-    
+
     try {
       console.log('Fetching Spoonacular recipe details for ID:', recipe.id);
-      
+
       const response = await axios.get(
         `https://api.spoonacular.com/recipes/${recipe.id}/information`,
         {
@@ -39,7 +37,7 @@ function RecipeDetails({
           }
         }
       );
-      
+
       console.log('Spoonacular API response:', response.data);
       setRecipeDetails(response.data);
     } catch (err) {
@@ -52,19 +50,19 @@ function RecipeDetails({
 
   const fetchCommunityRecipeDetails = useCallback(async () => {
     if (!recipe?.id) return;
-    
+
     setLoading(true);
     setError("");
-    
+
     try {
       console.log('Fetching community recipe details for ID:', recipe.id);
-      
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/community/${recipe.id}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log('Community API response:', data);
       setRecipeDetails(data);
@@ -84,8 +82,7 @@ function RecipeDetails({
         fetchSpoonacularRecipeDetails();
       }
     }
-    
-    // Reset state when modal closes
+
     if (!show) {
       setRecipeDetails(null);
       setError("");
@@ -106,8 +103,8 @@ function RecipeDetails({
 
   const getRecipeImage = () => {
     if (isCommunityRecipe) {
-      return recipe?.image_data ? 
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image` : 
+      return recipe?.image_data ?
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image` :
         null;
     }
     return recipe?.image || recipeDetails?.image;
@@ -131,8 +128,8 @@ function RecipeDetails({
   if (!recipe) return null;
 
   return (
-    <Modal 
-      show={show} 
+    <Modal
+      show={show}
       onHide={handleClose}
       size="xl"
       className="recipe-details-modal"
@@ -143,14 +140,14 @@ function RecipeDetails({
           <MoodBadge mood={recipe.mood || "Happy"} />
         </div>
       </Modal.Header>
-      
+
       <Modal.Body className="pt-2">
         {error && (
           <Alert variant="danger" className="mb-3">
             {error}
           </Alert>
         )}
-        
+
         {loading ? (
           <div className="text-center p-4">
             <Spinner animation="border" />
@@ -158,16 +155,14 @@ function RecipeDetails({
           </div>
         ) : (
           <Row className="h-100">
-            {/* Left Column - Image and Notes */}
             <Col lg={5} className="pe-4">
-              {/* Recipe Image */}
               {getRecipeImage() && (
                 <div className="recipe-image-section mb-4">
                   <img
                     src={getRecipeImage()}
                     alt={recipe.title}
                     className="w-100"
-                    style={{ 
+                    style={{
                       borderRadius: '12px',
                       objectFit: 'cover',
                       maxHeight: '300px'
@@ -180,7 +175,6 @@ function RecipeDetails({
                 </div>
               )}
 
-              {/* Recipe Meta Info */}
               <div className="recipe-meta mb-3">
                 {!isCommunityRecipe && recipeDetails && (
                   <>
@@ -192,7 +186,7 @@ function RecipeDetails({
                     </div>
                   </>
                 )}
-                
+
                 {isCommunityRecipe && (
                   <>
                     <div className="meta-item mb-2">
@@ -203,13 +197,12 @@ function RecipeDetails({
                     </div>
                   </>
                 )}
-                
+
                 <div className="meta-item mb-2">
                   <strong>Ingredients:</strong> {getIngredientsCount()}
                 </div>
               </div>
 
-              {/* Personal Notes - Always Visible */}
               {isAuthenticated && (
                 <div className="notes-section">
                   <h6 className="mb-3">Personal Notes</h6>
@@ -218,19 +211,18 @@ function RecipeDetails({
               )}
             </Col>
 
-            {/* Right Column - Ingredients and Instructions Tabs */}
             <Col lg={7} className="ps-4 border-start">
               {recipeDetails ? (
                 <Tabs defaultActiveKey="ingredients" className="mb-3">
                   <Tab eventKey="ingredients" title="Ingredients">
-                    <RecipeIngredients 
+                    <RecipeIngredients
                       recipeDetails={recipeDetails}
                       isCommunityRecipe={isCommunityRecipe}
                     />
                   </Tab>
 
                   <Tab eventKey="instructions" title="Instructions">
-                    <RecipeInstructions 
+                    <RecipeInstructions
                       recipeDetails={recipeDetails}
                       isCommunityRecipe={isCommunityRecipe}
                     />
@@ -245,13 +237,12 @@ function RecipeDetails({
           </Row>
         )}
       </Modal.Body>
-      
+
       <Modal.Footer className="border-0 pt-0">
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        
-        {/* For community recipes, show "View Full Recipe" button */}
+
         {isCommunityRecipe && onViewFullRecipe && (
           <Button
             variant="primary"
@@ -260,8 +251,7 @@ function RecipeDetails({
             View Full Recipe
           </Button>
         )}
-        
-        {/* For Spoonacular recipes, show original source link */}
+
         {!isCommunityRecipe && recipeDetails?.sourceUrl && (
           <Button
             variant="primary"

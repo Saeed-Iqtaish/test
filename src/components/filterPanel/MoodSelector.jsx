@@ -20,7 +20,7 @@ function MoodSelector({ selected = [], onSelect }) {
         {moods.map((mood) => (
           <ToggleButton
             key={mood}
-            id={`mood-${mood}`} // used by the CSS
+            id={`mood-${mood}`}
             type="checkbox"
             value={mood}
             checked={selected.includes(mood)}

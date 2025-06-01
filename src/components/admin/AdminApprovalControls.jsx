@@ -7,7 +7,7 @@ import "../../styles/admin/admin-approval-controls.css";
 function AdminApprovalControls({ recipe, onApprovalChange }) {
   const [loading, setLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [actionType, setActionType] = useState(null); // 'approve' or 'reject'
+  const [actionType, setActionType] = useState(null);
   const [error, setError] = useState("");
 
   const handleApprovalAction = (action) => {
@@ -16,23 +16,27 @@ function AdminApprovalControls({ recipe, onApprovalChange }) {
     setError("");
   };
 
+  
   const confirmAction = async () => {
     if (!actionType || !recipe?.id) return;
-
+    
     setLoading(true);
     setError("");
-
+    
     try {
-      const approved = actionType === 'approve';
-      await communityAPI.updateRecipeApproval(recipe.id, approved);
+      if (actionType === 'approve') {
+        await communityAPI.updateRecipeApproval(recipe.id, true);
+      } else if (actionType === 'reject') {
+        await communityAPI.deleteRecipe(recipe.id);
+      }
       
       setShowConfirmModal(false);
       
-      // Notify parent component about the change
       if (onApprovalChange) {
+        const approved = actionType === 'approve';
         onApprovalChange(recipe.id, approved);
       }
-
+      
     } catch (error) {
       console.error(`Error ${actionType}ing recipe:`, error);
       setError(error.response?.data?.error || `Failed to ${actionType} recipe`);
@@ -40,13 +44,13 @@ function AdminApprovalControls({ recipe, onApprovalChange }) {
       setLoading(false);
     }
   };
-
+  
   const cancelAction = () => {
     setShowConfirmModal(false);
     setActionType(null);
     setError("");
   };
-
+  
   if (!recipe) return null;
 
   return (
@@ -64,7 +68,7 @@ function AdminApprovalControls({ recipe, onApprovalChange }) {
               {error}
             </Alert>
           )}
-          
+
           <div className="approval-info mb-3">
             <div className="row">
               <div className="col-md-6">
@@ -92,7 +96,7 @@ function AdminApprovalControls({ recipe, onApprovalChange }) {
                 <FiCheck className="me-2" />
                 Approve Recipe
               </Button>
-              
+
               <Button
                 variant="danger"
                 size="lg"
@@ -110,7 +114,7 @@ function AdminApprovalControls({ recipe, onApprovalChange }) {
             <Alert variant="info" className="mb-0">
               <small>
                 <FiAlertTriangle className="me-1" />
-                <strong>Review Guidelines:</strong> Ensure the recipe has clear instructions, 
+                <strong>Review Guidelines:</strong> Ensure the recipe has clear instructions,
                 appropriate ingredients, and follows community standards before approval.
               </small>
             </Alert>

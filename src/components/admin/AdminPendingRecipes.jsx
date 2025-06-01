@@ -1,59 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Alert, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import AdminRecipeList from "./AdminRecipeList";
-import { communityAPI } from "../../services/api";
+import { useAdminRecipes } from "../../hooks/useAdminRecipes";
 
 function AdminPendingRecipes({ refreshTrigger, onRecipeStatusChange }) {
-  const [pendingRecipes, setPendingRecipes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { pendingRecipes, loading, error, fetchPendingRecipes } = useAdminRecipes();
 
   useEffect(() => {
     fetchPendingRecipes();
-  }, [refreshTrigger]);
-
-  const fetchPendingRecipes = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const response = await communityAPI.getPendingRecipes();
-      
-      // Add mood assignment to recipes (reusing existing logic)
-      const recipesWithMood = response.data.map(recipe => ({
-        ...recipe,
-        mood: assignMood(recipe)
-      }));
-      
-      setPendingRecipes(recipesWithMood);
-    } catch (error) {
-      console.error("Error fetching pending recipes:", error);
-      setError("Failed to load pending recipes");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Reuse the mood assignment logic from existing components
-  const assignMood = (recipe) => {
-    const text = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
-
-    if (text.includes("soup") || text.includes("creamy") || text.includes("bake")) {
-      return "Cozy";
-    }
-    if (text.includes("avocado") || text.includes("smooth")) {
-      return "Relaxed";
-    }
-    if (text.includes("spicy") || text.includes("noodle") || text.includes("chili")) {
-      return "Energetic";
-    }
-
-    return "Happy";
-  };
+  }, [refreshTrigger, fetchPendingRecipes]);
 
   const handleRecipeClick = (recipe) => {
-    // Navigate to the community recipe page with admin context
     navigate(`/admin/community/${recipe.id}`);
   };
 
@@ -122,15 +81,6 @@ function AdminPendingRecipes({ refreshTrigger, onRecipeStatusChange }) {
           </div>
         ) : (
           <>
-            <div className="mb-3">
-              <Alert variant="info" className="admin-info-alert">
-                <small>
-                  <strong>Review Instructions:</strong> Click on any recipe below to view its full details. 
-                  You can approve or reject recipes from the recipe detail page.
-                </small>
-              </Alert>
-            </div>
-            
             <AdminRecipeList
               recipes={pendingRecipes}
               onRecipeClick={handleRecipeClick}

@@ -1,4 +1,3 @@
-// src/hooks/useRecipeInteractions.js
 import { useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -11,7 +10,6 @@ const useRecipeInteractions = ({ openRecipeDetails, openAuthModal }) => {
 
   const handleFavoriteChange = useCallback((recipeId, isFavorited) => {
     console.log(`Recipe ${recipeId} favorite status changed: ${isFavorited}`);
-    // Additional favorite change logic can be added here
   }, []);
 
   const handleLoginRequired = useCallback(() => {

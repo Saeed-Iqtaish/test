@@ -14,7 +14,7 @@ function RecipeList({
   refreshTrigger = 0,
   onRecipeClick,
   onFavoriteChange,
-  enableInfiniteScroll = false // New prop for infinite scrolling
+  enableInfiniteScroll = false
 }) {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -103,13 +103,11 @@ function RecipeList({
         return { recipes: [], totalResults: 0 };
       }
 
-      // Separate favorites by type using is_community boolean
       const spoonacularFavorites = favorites.filter(fav => fav.is_community === false);
       const communityFavorites = favorites.filter(fav => fav.is_community === true);
 
       const allRecipes = [];
 
-      // Fetch Spoonacular recipes (is_community = false)
       if (spoonacularFavorites.length > 0) {
         const spoonacularPromises = spoonacularFavorites.map(async (fav) => {
           try {
@@ -136,7 +134,6 @@ function RecipeList({
         allRecipes.push(...spoonacularRecipes.filter(recipe => recipe !== null));
       }
 
-      // Fetch Community recipes (is_community = true)
       if (communityFavorites.length > 0) {
         const communityPromises = communityFavorites.map(async (fav) => {
           try {
@@ -196,7 +193,6 @@ function RecipeList({
     }
   }, [search, diet, allergy, mood, assignMood]);
 
-  // Initial load or filter change
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
@@ -216,8 +212,6 @@ function RecipeList({
     fetchFunction(controller)
       .then((result) => {
         setRecipes(result.recipes);
-        
-        // Check if there are more recipes available (only for Spoonacular with infinite scroll)
         if (enableInfiniteScroll && !isFavoritesPage && !isCommunityList) {
           setHasMore(result.recipes.length === RECIPES_PER_PAGE && result.totalResults > RECIPES_PER_PAGE);
         } else {
@@ -243,7 +237,6 @@ function RecipeList({
     return () => controller.abort();
   }, [isFavoritesPage, isCommunityList, fetchSpoonacularRecipes, fetchCommunityRecipes, fetchFavoriteRecipes, refreshTrigger, enableInfiniteScroll]);
 
-  // Load more recipes (only for Spoonacular with infinite scroll)
   const handleLoadMore = async () => {
     if (!enableInfiniteScroll || isFavoritesPage || isCommunityList || loadingMore || !hasMore) {
       return;
@@ -260,7 +253,6 @@ function RecipeList({
       setRecipes(prev => [...prev, ...result.recipes]);
       setCurrentPage(prev => prev + 1);
       
-      // Check if there are more recipes
       const totalLoaded = recipes.length + result.recipes.length;
       setHasMore(result.recipes.length === RECIPES_PER_PAGE && totalLoaded < result.totalResults);
       
@@ -309,7 +301,6 @@ function RecipeList({
         ))}
       </Row>
 
-      {/* Load More Button - only show for infinite scroll enabled pages */}
       {enableInfiniteScroll && !isFavoritesPage && !isCommunityList && (
         <div className="text-center mt-4">
           {hasMore ? (

@@ -18,11 +18,9 @@ function AdminStats({ refreshTrigger }) {
     try {
       setStats(prev => ({ ...prev, loading: true }));
       
-      // Fetch pending recipes
       const pendingResponse = await communityAPI.getPendingRecipes();
       const pendingCount = pendingResponse.data.length;
       
-      // Fetch all approved recipes
       const allResponse = await communityAPI.getRecipes();
       const approvedCount = allResponse.data.length;
       

@@ -28,13 +28,11 @@ const useHomeModals = () => {
   }, []);
 
   return {
-    // Modal states
     showFilterModal,
     showAuthModal,
     showRecipeDetails,
     selectedRecipe,
-    
-    // Modal actions
+
     openFilterModal,
     closeFilterModal,
     openAuthModal,

@@ -10,7 +10,7 @@ function SearchFilterControls({
   showFilters = false,
   activeFilterCount = 0,
   className = "",
-  alignment = "right" // "left", "right", "center", "between"
+  alignment = "right"
 }) {
   const getContainerClass = () => {
     const baseClass = "search-filter-controls";
