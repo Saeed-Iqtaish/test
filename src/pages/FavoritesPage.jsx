@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Container, Button } from "react-bootstrap";
-import { FiFilter } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "../components/auth/AuthModal";
 import FavoritesHeader from "../components/favorites/FavoritesHeader";
-import SearchBar from "../components/global/SearchBar";
-import FilterModal from "../components/filterPanel/FilterModal"; // Changed import
+import SearchFilterControls from "../components/global/SearchFilterControls"; // New reusable component
+import FilterModal from "../components/filterPanel/FilterModal";
 import RecipeList from "../components/global/RecipeList";
 import RecipeDetails from "../components/global/RecipeDetails";
 import "../styles/global/global.css";
 
 function FavoritesPage() {
-  const { user, isAuthenticated, isLoading } = useAuth(); // Added user here
+  const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -37,18 +36,31 @@ function FavoritesPage() {
     return () => clearTimeout(delay);
   }, [filters.search]);
 
-  function handleApplyFilters() {
-    setAppliedFilters({ ...filters });
-  }
+  const updateFilter = (field, value) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
 
-  function handleClearFilters() {
+  const handleApplyFilters = () => {
+    setAppliedFilters({ ...filters });
+    setShowFilters(false);
+  };
+
+  const handleClearFilters = () => {
     const cleared = { search: "", diet: [], allergy: [], mood: [] };
     setFilters(cleared);
     setAppliedFilters(cleared);
-  }
+  };
+
+  // Calculate active filter count
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (filters.mood.length > 0) count += filters.mood.length;
+    if (filters.diet.length > 0) count += filters.diet.length;
+    if (filters.allergy.length > 0) count += filters.allergy.length;
+    return count;
+  };
 
   function handleRecipeClick(recipe) {
-    // Show modal first for all recipes
     setSelectedRecipe(recipe);
     setShowRecipeDetails(true);
   }
@@ -59,19 +71,14 @@ function FavoritesPage() {
   }
 
   function handleViewFullRecipe(recipe) {
-    // Navigate to full recipe page from modal
     if (recipe.isCommunityRecipe) {
       navigate(`/community/${recipe.id}`);
-    } else {
-      // For API recipes, could navigate to a recipe detail page or just close modal
-      console.log('API recipe - could implement full recipe page');
     }
     setShowRecipeDetails(false);
   }
 
   function handleFavoriteChange(recipeId, isFavorited) {
     console.log(`Recipe ${recipeId} favorite status changed: ${isFavorited}`);
-    // Recipe will be automatically removed from favorites list if unfavorited
   }
 
   if (isLoading) {
@@ -114,22 +121,15 @@ function FavoritesPage() {
       <Container fluid className="px-3 px-md-5">
         <FavoritesHeader />
 
-        {/* Search and Filter Controls - Moved to right */}
-        <div className="d-flex flex-column flex-md-row align-items-center justify-content-end gap-3 mb-4">
-          <div className="d-flex flex-column flex-md-row align-items-center gap-3">
-            <SearchBar
-              searchTerm={filters.search}
-              setSearchTerm={(val) => setFilters((prev) => ({ ...prev, search: val }))}
-            />
-            <button
-              className={`filter-button ${showFilters ? "active" : ""}`}
-              onClick={() => setShowFilters((prev) => !prev)}
-            >
-              <FiFilter className="filter-icon" />
-              Filter
-            </button>
-          </div>
-        </div>
+        {/* Using the new reusable SearchFilterControls component */}
+        <SearchFilterControls
+          searchTerm={filters.search}
+          setSearchTerm={(val) => updateFilter("search", val)}
+          onFilterClick={() => setShowFilters(true)}
+          showFilters={showFilters}
+          activeFilterCount={getActiveFilterCount()}
+          alignment="right"
+        />
 
         <div className="mt-4">
           <RecipeList

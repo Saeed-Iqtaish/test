@@ -1,0 +1,117 @@
+.search-filter-controls {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* Alignment options */
+.search-filter-controls.align-left {
+  justify-content: flex-start;
+}
+
+.search-filter-controls.align-right {
+  justify-content: flex-end;
+}
+
+.search-filter-controls.align-center {
+  justify-content: center;
+}
+
+.search-filter-controls.align-between {
+  justify-content: space-between;
+}
+
+.search-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Filter Button Styles */
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: 1px solid var(--main);
+  background: white;
+  color: var(--main);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.filter-button:hover {
+  background: #fff3f3;
+  border-color: var(--main);
+}
+
+.filter-button.active {
+  background: var(--main);
+  color: white;
+  border-color: var(--main);
+}
+
+.filter-icon {
+  font-size: 1.1rem;
+}
+
+/* Badge for active filter count */
+.filter-button .badge {
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .search-filter-controls {
+    margin-bottom: 1rem;
+  }
+
+  .search-filter-controls.align-right,
+  .search-filter-controls.align-between {
+    justify-content: center;
+  }
+  
+  .search-filter-group {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    align-items: stretch;
+  }
+  
+  .filter-button {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    justify-content: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  /* Make search bar full width on mobile */
+  .search-filter-group .search-container {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .search-filter-group {
+    gap: 0.5rem;
+  }
+  
+  .filter-button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}

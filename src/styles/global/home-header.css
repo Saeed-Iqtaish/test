@@ -1,0 +1,203 @@
+.enhanced-home-header {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: white;
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-home-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.enhanced-home-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.header-main {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.header-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  line-height: 1.2;
+}
+
+.header-subtitle {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.95;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* User allergies information */
+.user-allergies-info {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.allergies-indicator {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.allergies-indicator:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.allergies-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.allergies-text {
+  text-align: left;
+}
+
+.allergies-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.allergies-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.allergy-badge {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-block;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .enhanced-home-header {
+    padding: 2rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .header-title {
+    font-size: 2rem;
+  }
+  
+  .header-subtitle {
+    font-size: 1rem;
+  }
+
+  .allergies-indicator {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .allergies-text {
+    text-align: center;
+  }
+
+  .allergies-list {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .enhanced-home-header {
+    padding: 1.5rem 1rem;
+  }
+  
+  .header-title {
+    font-size: 1.75rem;
+  }
+  
+  .header-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .allergies-indicator {
+    padding: 0.6rem 0.8rem;
+    margin: 0 0.5rem;
+  }
+
+  .allergy-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
+
+/* Animation for smooth entrance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.enhanced-home-header {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Hover effects for better interactivity */
+.enhanced-home-header:hover::before {
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+.enhanced-home-header:hover::after {
+  transform: scale(1.2);
+  transition: transform 0.3s ease;
+}
