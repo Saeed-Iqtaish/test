@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Spinner, Alert, Button, Row, Col, Tabs, Tab } from 'react-bootstrap';
-import { FiArrowLeft, FiEdit3, FiHome } from 'react-icons/fi';
-import RecipeHeader from '../components/recipeDetails/RecipeHeader';
-import RecipeMeta from '../components/recipeDetails/RecipeMeta';
-import RecipeDescription from '../components/recipeDetails/RecipeDescription';
+import { Container, Spinner, Alert, Button, Row, Col, Tabs, Tab, Form, Card, Badge } from 'react-bootstrap';
+import { FiArrowLeft, FiHome, FiEdit3 } from 'react-icons/fi';
+
+// Import existing components
+import MoodBadge from '../components/global/MoodBadge';
+import FavoriteButton from '../components/global/FavoriteButton';
 import RecipeIngredients from '../components/recipeDetails/RecipeIngredients';
 import RecipeInstructions from '../components/recipeDetails/RecipeInstructions';
-import RecipeNotes from '../components/recipeDetails/RecipeNotes';
 import EditRecipeModal from '../components/community/EditRecipeModal';
+import { AuthModal } from '../components/auth/AuthModal';
 
 import { useAuth } from '../contexts/AuthContext';
+import { notesAPI } from '../services/api';
 import '../styles/pages/community-recipe-page.css';
 
 function CommunityRecipePage() {
@@ -21,7 +23,12 @@ function CommunityRecipePage() {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showEditModal, setShowEditModal] = useState(false); // Add this state
+  const [userNote, setUserNote] = useState('');
+  const [isEditingNote, setIsEditingNote] = useState(false);
+  const [tempNote, setTempNote] = useState('');
+  const [noteLoading, setNoteLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchCommunityRecipe = useCallback(async () => {
     if (!id) return;
@@ -32,7 +39,6 @@ function CommunityRecipePage() {
       
       console.log('Fetching community recipe for ID:', id);
       
-      // Fetch from backend API only (community recipes)
       const response = await fetch(`${process.env.REACT_APP_API_URL}/community/${id}`);
       
       if (!response.ok) {
@@ -47,7 +53,6 @@ function CommunityRecipePage() {
       const data = await response.json();
       console.log('Community recipe data:', data);
       
-      // Add mood assignment for consistency
       const recipeWithMood = {
         ...data,
         mood: assignMood(data)
@@ -61,6 +66,19 @@ function CommunityRecipePage() {
       setLoading(false);
     }
   }, [id]);
+
+  const fetchUserNote = useCallback(async () => {
+    if (!isAuthenticated || !recipe?.id) return;
+    
+    try {
+      const response = await notesAPI.getNotes(recipe.id);
+      if (response.data.length > 0) {
+        setUserNote(response.data[0].note);
+      }
+    } catch (error) {
+      console.error("Error fetching note:", error);
+    }
+  }, [recipe?.id, isAuthenticated]);
 
   const assignMood = (recipe) => {
     const text = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
@@ -82,6 +100,10 @@ function CommunityRecipePage() {
     fetchCommunityRecipe();
   }, [fetchCommunityRecipe]);
 
+  useEffect(() => {
+    fetchUserNote();
+  }, [fetchUserNote]);
+
   const handleBackClick = () => {
     navigate('/community');
   };
@@ -91,7 +113,7 @@ function CommunityRecipePage() {
   };
 
   const handleEditClick = () => {
-    setShowEditModal(true); // Show edit modal instead of console.log
+    setShowEditModal(true);
   };
 
   const handleRecipeUpdated = () => {
@@ -103,6 +125,66 @@ function CommunityRecipePage() {
     // User can edit if they created the recipe or are admin
     return isAuthenticated && 
            (user?.is_admin || user?.id === recipe?.created_by);
+  };
+
+  const handleSaveNote = async () => {
+    setNoteLoading(true);
+    try {
+      await notesAPI.saveNote(recipe.id, tempNote);
+      setUserNote(tempNote);
+      setIsEditingNote(false);
+      setTempNote('');
+    } catch (error) {
+      console.error("Error saving note:", error);
+    } finally {
+      setNoteLoading(false);
+    }
+  };
+
+  const handleEditNote = () => {
+    setTempNote(userNote);
+    setIsEditingNote(true);
+  };
+
+  const handleCancelNote = () => {
+    setTempNote('');
+    setIsEditingNote(false);
+  };
+
+  const handleDeleteNote = async () => {
+    if (!window.confirm('Are you sure you want to delete this note?')) return;
+    
+    setNoteLoading(true);
+    try {
+      await notesAPI.deleteNote(recipe.id);
+      setUserNote('');
+      setIsEditingNote(false);
+      setTempNote('');
+    } catch (error) {
+      console.error("Error deleting note:", error);
+    } finally {
+      setNoteLoading(false);
+    }
+  };
+
+  const handleFavoriteChange = (recipeId, isFavorited) => {
+    console.log(`Recipe ${recipeId} favorite status changed: ${isFavorited}`);
+  };
+
+  const handleLoginRequired = () => {
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   if (loading) {
@@ -122,10 +204,11 @@ function CommunityRecipePage() {
           <p>{error}</p>
           <div className="d-flex gap-2">
             <Button variant="outline-danger" onClick={handleBackClick}>
+              <FiArrowLeft className="me-1" />
               Back to Community
             </Button>
             <Button variant="outline-primary" onClick={handleHomeClick}>
-              <FiHome className="me-2" />
+              <FiHome className="me-1" />
               Home
             </Button>
           </div>
@@ -142,10 +225,11 @@ function CommunityRecipePage() {
           <p>The recipe you're looking for doesn't exist or has been removed.</p>
           <div className="d-flex gap-2">
             <Button variant="outline-warning" onClick={handleBackClick}>
+              <FiArrowLeft className="me-1" />
               Back to Community
             </Button>
             <Button variant="outline-primary" onClick={handleHomeClick}>
-              <FiHome className="me-2" />
+              <FiHome className="me-1" />
               Home
             </Button>
           </div>
@@ -154,157 +238,216 @@ function CommunityRecipePage() {
     );
   }
 
+  const recipeImageUrl = recipe.image_data ? 
+    `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image` : 
+    null;
+
   return (
-    <>
-      <div className="community-recipe-page">
-        {/* Top Navigation Bar */}
-        <div className="recipe-nav-bar">
-          <Container>
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex gap-2">
-                <Button 
-                  variant="outline-primary" 
-                  onClick={handleBackClick}
-                  className="d-flex align-items-center gap-2"
-                  size="sm"
-                >
-                  <FiArrowLeft /> Community
-                </Button>
-                <Button 
-                  variant="outline-secondary" 
-                  onClick={handleHomeClick}
-                  className="d-flex align-items-center gap-2"
-                  size="sm"
-                >
-                  <FiHome /> Home
-                </Button>
-              </div>
-              
-              {canEditRecipe() && (
-                <Button
-                  variant="outline-secondary"
-                  onClick={handleEditClick}
-                  className="d-flex align-items-center gap-2"
-                  size="sm"
-                >
-                  <FiEdit3 /> Edit Recipe
-                </Button>
-              )}
-            </div>
-          </Container>
+    <Container className="py-4 recipe-details-page">
+      {/* Enhanced Navigation Bar */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex gap-2">
+          <Button 
+            className="btn-main"
+            onClick={handleBackClick}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px',
+              background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+              border: 'none',
+              color: 'white',
+              fontWeight: '600',
+              borderRadius: '25px',
+              padding: '0.6rem 1.5rem',
+              fontSize: '0.95rem',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 8px rgba(255, 107, 107, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 4px 12px rgba(255, 107, 107, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 2px 8px rgba(255, 107, 107, 0.3)';
+            }}
+          >
+            <FiArrowLeft /> Back to Community
+          </Button>
+          <Button 
+            variant="outline-secondary" 
+            onClick={handleHomeClick}
+            className="d-flex align-items-center gap-2"
+          >
+            <FiHome /> Home
+          </Button>
         </div>
+        
+        {canEditRecipe() && (
+          <Button
+            variant="outline-secondary"
+            onClick={handleEditClick}
+            className="d-flex align-items-center gap-2"
+          >
+            <FiEdit3 /> Edit Recipe
+          </Button>
+        )}
+      </div>
 
-        <Container className="py-4">
-          {/* Recipe Header */}
-          <RecipeHeader
-            title={recipe.title}
-            image={recipe.image_data ? `${process.env.REACT_APP_API_URL}/community/${recipe.id}/image` : null}
-            mood={recipe.mood}
+      {/* Recipe Header */}
+      <div className="recipe-header-section mb-4">
+        <div className="d-flex justify-content-between align-items-start mb-3">
+          <div className="d-flex align-items-center gap-3 flex-wrap">
+            <h1 className="recipe-title mb-0">{recipe.title}</h1>
+            <MoodBadge mood={recipe.mood} />
+            {/* Only show status to recipe creator */}
+            {isAuthenticated && user?.id === recipe?.created_by && (
+              recipe.approved ? (
+                <Badge bg="success">✓ Approved</Badge>
+              ) : (
+                <Badge bg="warning">⏳ Pending</Badge>
+              )
+            )}
+          </div>
+          <FavoriteButton 
+            recipeId={recipe.id}
             isCommunityRecipe={true}
-            approved={recipe.approved}
-            recipe={recipe}
+            onFavoriteChange={handleFavoriteChange}
+            onLoginRequired={handleLoginRequired}
           />
+        </div>
+        
+        {/* Recipe Meta */}
+        <div className="recipe-meta mb-4">
+          <div className="meta-item mb-2">
+            <strong>Prep Time:</strong> {recipe.prep_time ? `${recipe.prep_time} mins` : 'Not specified'} • 
+            <strong> Servings:</strong> {recipe.servings ? `${recipe.servings}` : 'Not specified'} • 
+            <strong> Created by:</strong> {recipe.created_by_username || 'Anonymous'}
+          </div>
+          <div className="meta-item">
+            <strong>Created:</strong> {formatDate(recipe.created_at)}
+            {recipe.updated_at !== recipe.created_at && (
+              <span> • <strong>Updated:</strong> {formatDate(recipe.updated_at)}</span>
+            )}
+          </div>
+        </div>
+      </div>
 
-          <Row className="mt-4">
-            <Col lg={8}>
-              {/* Recipe Content Tabs */}
-              <Tabs defaultActiveKey="overview" className="mb-4">
-                <Tab eventKey="overview" title="Overview">
-                  <RecipeDescription 
-                    recipe={recipe}
-                    recipeDetails={recipe}
-                    isCommunityRecipe={true}
-                  />
-                </Tab>
+      <Row>
+        {/* Left Column - Image and Notes */}
+        <Col lg={5} className="recipe-left-column">
+          {/* Recipe Image */}
+          {recipeImageUrl && (
+            <div className="recipe-image-container mb-4">
+              <img
+                src={recipeImageUrl}
+                alt={recipe.title}
+                className="recipe-image"
+                onError={(e) => {
+                  console.error('Error loading recipe image:', e.target.src);
+                  e.target.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
 
-                <Tab eventKey="ingredients" title="Ingredients">
-                  <RecipeIngredients 
-                    recipeDetails={recipe}
-                    isCommunityRecipe={true}
-                  />
-                </Tab>
-
-                <Tab eventKey="instructions" title="Instructions">
-                  <RecipeInstructions 
-                    recipeDetails={recipe}
-                    isCommunityRecipe={true}
-                  />
-                </Tab>
-
-                {/* Personal Notes tab for authenticated users */}
-                {isAuthenticated && (
-                  <Tab eventKey="notes" title="My Notes">
-                    <RecipeNotes recipe={recipe} />
-                  </Tab>
-                )}
-              </Tabs>
-            </Col>
-
-            <Col lg={4}>
-              {/* Recipe Meta Information Sidebar */}
-              <div className="recipe-sidebar">
-                <RecipeMeta 
-                  recipe={recipe}
-                  recipeDetails={recipe}
-                  isCommunityRecipe={true}
-                  isAuthenticated={isAuthenticated}
-                  onFavoriteChange={() => {}} // Community recipes can't be favorited
-                />
-                
-                {/* Additional Community Info */}
-                <div className="community-info mt-4 p-3 bg-light rounded">
-                  <h6>Community Recipe Info</h6>
-                  <div className="info-item mb-2">
-                    <strong>Status:</strong>{" "}
-                    {recipe.approved ? (
-                      <span className="text-success">✓ Approved</span>
+          {/* Personal Notes */}
+          {isAuthenticated && (
+            <Card className="mb-4">
+              <Card.Header>
+                <div className="d-flex justify-content-between align-items-center">
+                  <h6 className="mb-0">Personal Notes</h6>
+                  {userNote && !isEditingNote && (
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={handleDeleteNote}
+                      disabled={noteLoading}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                </div>
+              </Card.Header>
+              <Card.Body>
+                {isEditingNote ? (
+                  <div className="notes-edit-form">
+                    <Form.Control
+                      as="textarea"
+                      rows={6}
+                      value={tempNote}
+                      onChange={(e) => setTempNote(e.target.value)}
+                      placeholder="Add your cooking notes, tips, or modifications here..."
+                      className="notes-textarea mb-3"
+                    />
+                    <div className="d-flex gap-2">
+                      <Button
+                        variant="primary"
+                        onClick={handleSaveNote}
+                        disabled={noteLoading}
+                        className="flex-fill"
+                      >
+                        {noteLoading ? 'Saving...' : 'Save Notes'}
+                      </Button>
+                      <Button
+                        variant="outline-secondary"
+                        onClick={handleCancelNote}
+                        disabled={noteLoading}
+                        className="flex-fill"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="notes-display" onClick={handleEditNote} style={{ cursor: 'pointer', minHeight: '60px' }}>
+                    {userNote ? (
+                      <div className="user-note" style={{ whiteSpace: 'pre-wrap' }}>
+                        {userNote}
+                      </div>
                     ) : (
-                      <span className="text-warning">⏳ Pending Approval</span>
+                      <div className="add-notes-placeholder text-muted text-center py-3">
+                        <small>Click to add your personal notes and cooking tips</small>
+                      </div>
                     )}
                   </div>
-                  <div className="info-item mb-2">
-                    <strong>Created:</strong>{" "}
-                    {new Date(recipe.created_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </div>
-                  {recipe.updated_at !== recipe.created_at && (
-                    <div className="info-item mb-2">
-                      <strong>Last Updated:</strong>{" "}
-                      {new Date(recipe.updated_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </div>
-                  )}
-                  <div className="info-item">
-                    <strong>Recipe ID:</strong> #{recipe.id}
-                  </div>
-                </div>
+                )}
+              </Card.Body>
+            </Card>
+          )}
+        </Col>
 
-                {/* Recipe Stats */}
-                <div className="recipe-stats mt-4 p-3 bg-light rounded">
-                  <h6>Recipe Details</h6>
-                  <div className="stats-grid">
-                    <div className="stat-item mb-2">
-                      <strong>Ingredients:</strong> {recipe.ingredients?.length || 0}
-                    </div>
-                    <div className="stat-item mb-2">
-                      <strong>Instructions:</strong> {recipe.instructions?.length || 0} steps
-                    </div>
-                    <div className="stat-item">
-                      <strong>Mood:</strong> {recipe.mood}
-                    </div>
-                  </div>
-                </div>
+        {/* Right Column - Ingredients and Instructions */}
+        <Col lg={7} className="recipe-content-column">
+          <Tabs defaultActiveKey="ingredients" className="recipe-tabs">
+            <Tab eventKey="ingredients" title={`Ingredients (${recipe.ingredients?.length || 0})`}>
+              <div className="tab-content-area">
+                <RecipeIngredients 
+                  recipeDetails={recipe}
+                  isCommunityRecipe={true}
+                />
               </div>
-            </Col>
-          </Row>
-        </Container>
-      </div>
+            </Tab>
+
+            <Tab eventKey="instructions" title={`Instructions (${recipe.instructions?.length || 0})`}>
+              <div className="tab-content-area">
+                <RecipeInstructions 
+                  recipeDetails={recipe}
+                  isCommunityRecipe={true}
+                />
+              </div>
+            </Tab>
+          </Tabs>
+        </Col>
+      </Row>
+
+      {/* Auth Modal for login prompt */}
+      <AuthModal
+        show={showAuthModal}
+        onHide={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+      />
 
       {/* Edit Recipe Modal */}
       <EditRecipeModal
@@ -313,7 +456,7 @@ function CommunityRecipePage() {
         recipe={recipe}
         onRecipeUpdated={handleRecipeUpdated}
       />
-    </>
+    </Container>
   );
 }
 

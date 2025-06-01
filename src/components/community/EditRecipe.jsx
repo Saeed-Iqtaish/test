@@ -1,132 +1,218 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
-import { FiPlus, FiMinus } from "react-icons/fi";
+import { Modal, Button, Form, Alert, Spinner, Row, Col } from "react-bootstrap";
+import RecipeIngredientsList from "./RecipeIngredientsList";
+import RecipeInstructionsList from "./RecipeInstructionsList";
+import { communityAPI } from "../../services/api";
 
-function EditRecipe({ show, onHide, recipe, onRecipeUpdated }) {
+function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
   const [formData, setFormData] = useState({
     title: "",
+    prepTime: "",
+    servings: "",
     image: null
   });
   const [ingredients, setIngredients] = useState([""]);
   const [instructions, setInstructions] = useState([""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  // Reset and populate form when modal opens with recipe data
   useEffect(() => {
-    if (show && recipe) {
-      setFormData({
-        title: recipe.title || "",
-        image: null
-      });
-      
-      if (recipe.ingredients && recipe.ingredients.length > 0) {
-        setIngredients(recipe.ingredients.map(ing => ing.ingredient || ing));
-      } else {
-        setIngredients([""]);
-      }
-      
-      if (recipe.instructions && recipe.instructions.length > 0) {
-        const sortedInstructions = recipe.instructions
-          .sort((a, b) => (a.step_number || 0) - (b.step_number || 0))
-          .map(inst => inst.instruction || inst);
-        setInstructions(sortedInstructions);
-      } else {
-        setInstructions([""]);
-      }
+    if (show && recipe && recipe.id) {
+      console.log('🔄 Populating edit form with recipe:', recipe);
+      populateFormData(recipe);
+      setIsInitialized(true);
+    } else if (!show) {
+      // Reset form when modal closes
+      resetForm();
+      setIsInitialized(false);
     }
   }, [show, recipe]);
 
-  function handleInputChange(e) {
+  const populateFormData = (recipeData) => {
+    // Set basic form data
+    setFormData({
+      title: recipeData.title || "",
+      prepTime: recipeData.prep_time?.toString() || "",
+      servings: recipeData.servings?.toString() || "",
+      image: null // Always null for file input
+    });
+
+    // Handle ingredients - they might be in different formats
+    if (recipeData.ingredients && Array.isArray(recipeData.ingredients)) {
+      const ingredientsList = recipeData.ingredients.map(ingredient => {
+        // Handle both object format {ingredient: "..."} and string format
+        if (typeof ingredient === 'object' && ingredient.ingredient) {
+          return ingredient.ingredient;
+        }
+        return ingredient.toString();
+      }).filter(ing => ing && ing.trim()); // Remove empty items
+      
+      setIngredients(ingredientsList.length > 0 ? ingredientsList : [""]);
+      console.log('📋 Populated ingredients:', ingredientsList);
+    } else {
+      setIngredients([""]);
+    }
+
+    // Handle instructions - they might be in different formats
+    if (recipeData.instructions && Array.isArray(recipeData.instructions)) {
+      const instructionsList = recipeData.instructions
+        .sort((a, b) => {
+          // Sort by step_number if available
+          if (a.step_number && b.step_number) {
+            return a.step_number - b.step_number;
+          }
+          return 0;
+        })
+        .map(instruction => {
+          // Handle both object format {instruction: "..."} and string format
+          if (typeof instruction === 'object' && instruction.instruction) {
+            return instruction.instruction;
+          }
+          return instruction.toString();
+        }).filter(inst => inst && inst.trim()); // Remove empty items
+      
+      setInstructions(instructionsList.length > 0 ? instructionsList : [""]);
+      console.log('📖 Populated instructions:', instructionsList);
+    } else {
+      setInstructions([""]);
+    }
+
+    setError(""); // Clear any previous errors
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      prepTime: "",
+      servings: "",
+      image: null
+    });
+    setIngredients([""]);
+    setInstructions([""]);
+    setError("");
+    setLoading(false);
+  };
+
+  const handleInputChange = (e) => {
     const { name, value, files } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: files ? files[0] : value
     }));
-  }
+  };
 
-  function handleIngredientChange(index, value) {
-    const newIngredients = [...ingredients];
-    newIngredients[index] = value;
+  const handleIngredientsChange = (newIngredients) => {
     setIngredients(newIngredients);
-  }
+  };
 
-  function addIngredient() {
-    setIngredients([...ingredients, ""]);
-  }
-
-  function removeIngredient(index) {
-    if (ingredients.length > 1) {
-      setIngredients(ingredients.filter((_, i) => i !== index));
-    }
-  }
-
-  function handleInstructionChange(index, value) {
-    const newInstructions = [...instructions];
-    newInstructions[index] = value;
+  const handleInstructionsChange = (newInstructions) => {
     setInstructions(newInstructions);
-  }
+  };
 
-  function addInstruction() {
-    setInstructions([...instructions, ""]);
-  }
-
-  function removeInstruction(index) {
-    if (instructions.length > 1) {
-      setInstructions(instructions.filter((_, i) => i !== index));
-    }
-  }
-
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!recipe?.id) return;
     
     setLoading(true);
     setError("");
 
+    // Validation
+    if (!formData.title.trim()) {
+      setError("Recipe title is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.prepTime || parseInt(formData.prepTime) <= 0) {
+      setError("Valid prep time is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.servings || parseInt(formData.servings) <= 0) {
+      setError("Valid number of servings is required");
+      setLoading(false);
+      return;
+    }
+
+    const validIngredients = ingredients.filter(ing => ing && ing.trim());
+    const validInstructions = instructions.filter(inst => inst && inst.trim());
+
+    if (validIngredients.length === 0) {
+      setError("At least one ingredient is required");
+      setLoading(false);
+      return;
+    }
+
+    if (validInstructions.length === 0) {
+      setError("At least one instruction is required");
+      setLoading(false);
+      return;
+    }
+
     try {
       const submitData = new FormData();
-      submitData.append("title", formData.title);
-      submitData.append("ingredients", JSON.stringify(ingredients.filter(ing => ing.trim())));
-      submitData.append("instructions", JSON.stringify(instructions.filter(inst => inst.trim())));
+      submitData.append("title", formData.title.trim());
+      submitData.append("prep_time", parseInt(formData.prepTime));
+      submitData.append("servings", parseInt(formData.servings));
+      submitData.append("ingredients", JSON.stringify(validIngredients));
+      submitData.append("instructions", JSON.stringify(validInstructions));
       
       if (formData.image) {
         submitData.append("image", formData.image);
       }
 
-      const response = await fetch(`/api/community/${recipe.id}`, {
-        method: "PUT",
-        body: submitData
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || "Failed to update recipe");
-      }
-
+      console.log('🔄 Updating recipe with ID:', recipe.id);
+      await communityAPI.updateRecipe(recipe.id, submitData);
+      
+      console.log('✅ Recipe updated successfully!');
       onRecipeUpdated();
+      onHide();
     } catch (err) {
-      console.error("Error updating recipe:", err);
-      setError(err.message || "Failed to update recipe. Please try again.");
+      console.error("❌ Error updating recipe:", err);
+      setError(err.response?.data?.details || err.response?.data?.error || "Failed to update recipe. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClose = () => {
+    setError("");
+    onHide();
+  };
+
+  // Show loading state while form is being populated
+  if (show && !isInitialized && recipe) {
+    return (
+      <Modal show={show} onHide={handleClose} size="lg" className="edit-recipe-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Recipe</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center py-5">
+          <Spinner animation="border" />
+          <p className="mt-3">Loading recipe data...</p>
+        </Modal.Body>
+      </Modal>
+    );
   }
 
   return (
     <Modal 
       show={show} 
-      onHide={onHide}
+      onHide={handleClose}
       size="lg"
       className="edit-recipe-modal"
     >
       <Modal.Header closeButton>
-        <Modal.Title>Edit Recipe</Modal.Title>
+        <Modal.Title>Edit Recipe: {formData.title || 'Loading...'}</Modal.Title>
       </Modal.Header>
       
-      <Modal.Body>
-        {error && <Alert variant="danger">{error}</Alert>}
-        
-        <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
+        <Modal.Body>
+          {error && <Alert variant="danger">{error}</Alert>}
+          
           <Form.Group className="mb-3">
             <Form.Label>Recipe Title *</Form.Label>
             <Form.Control
@@ -139,6 +225,45 @@ function EditRecipe({ show, onHide, recipe, onRecipeUpdated }) {
             />
           </Form.Group>
 
+          <Row className="mb-3">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Prep Time (minutes) *</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="prepTime"
+                  value={formData.prepTime}
+                  onChange={handleInputChange}
+                  placeholder="e.g., 30"
+                  min="1"
+                  max="1440"
+                  required
+                />
+                <Form.Text className="text-muted">
+                  Total preparation and cooking time
+                </Form.Text>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Servings *</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="servings"
+                  value={formData.servings}
+                  onChange={handleInputChange}
+                  placeholder="e.g., 4"
+                  min="1"
+                  max="50"
+                  required
+                />
+                <Form.Text className="text-muted">
+                  Number of people this serves
+                </Form.Text>
+              </Form.Group>
+            </Col>
+          </Row>
+
           <Form.Group className="mb-3">
             <Form.Label>Update Recipe Image</Form.Label>
             <Form.Control
@@ -148,90 +273,55 @@ function EditRecipe({ show, onHide, recipe, onRecipeUpdated }) {
               onChange={handleInputChange}
             />
             <Form.Text className="text-muted">
-              Leave empty to keep current image
+              Leave empty to keep current image. Max size: 5MB
             </Form.Text>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Ingredients *</Form.Label>
-            {ingredients.map((ingredient, index) => (
-              <div key={index} className="d-flex mb-2">
-                <Form.Control
-                  type="text"
-                  value={ingredient}
-                  onChange={(e) => handleIngredientChange(index, e.target.value)}
-                  placeholder={`Ingredient ${index + 1}`}
-                  required={index === 0}
-                />
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  className="ms-2"
-                  onClick={() => removeIngredient(index)}
-                  disabled={ingredients.length === 1}
-                >
-                  <FiMinus />
-                </Button>
-              </div>
-            ))}
-            <Button variant="outline-primary" size="sm" onClick={addIngredient}>
-              <FiPlus className="me-1" />
-              Add Ingredient
-            </Button>
-          </Form.Group>
+          <RecipeIngredientsList
+            ingredients={ingredients}
+            onChange={handleIngredientsChange}
+          />
 
-          <Form.Group className="mb-3">
-            <Form.Label>Instructions *</Form.Label>
-            {instructions.map((instruction, index) => (
-              <div key={index} className="d-flex mb-2">
-                <Form.Control
-                  as="textarea"
-                  rows={2}
-                  value={instruction}
-                  onChange={(e) => handleInstructionChange(index, e.target.value)}
-                  placeholder={`Step ${index + 1}`}
-                  required={index === 0}
-                />
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  className="ms-2"
-                  onClick={() => removeInstruction(index)}
-                  disabled={instructions.length === 1}
-                >
-                  <FiMinus />
-                </Button>
-              </div>
-            ))}
-            <Button variant="outline-primary" size="sm" onClick={addInstruction}>
-              <FiPlus className="me-1" />
-              Add Step
-            </Button>
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide} disabled={loading}>
-          Cancel
-        </Button>
-        <Button
-          variant="primary"
-          onClick={handleSubmit}
-          disabled={loading || !formData.title.trim()}
-        >
-          {loading ? (
-            <>
-              <Spinner size="sm" className="me-2" />
-              Updating...
-            </>
-          ) : (
-            "Update Recipe"
+          <RecipeInstructionsList
+            instructions={instructions}
+            onChange={handleInstructionsChange}
+          />
+
+          {/* Debug info in development */}
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mt-3">
+              <summary className="text-muted small">Debug Info (Dev Only)</summary>
+              <pre className="small text-muted mt-2">
+                Ingredients: {JSON.stringify(ingredients, null, 2)}
+                Instructions: {JSON.stringify(instructions, null, 2)}
+                Form Data: {JSON.stringify(formData, null, 2)}
+              </pre>
+            </details>
           )}
-        </Button>
-      </Modal.Footer>
+        </Modal.Body>
+        
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={loading || !formData.title.trim() || !isInitialized}
+          >
+            {loading ? (
+              <>
+                <Spinner size="sm" className="me-2" />
+                Updating...
+              </>
+            ) : (
+              "Update Recipe"
+            )}
+          </Button>
+        </Modal.Footer>
+      </Form>
     </Modal>
   );
 }
 
-export default EditRecipe;
+export default EditRecipeModal;

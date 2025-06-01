@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Form, Button, Alert, Tabs, Tab } from 'react-bootstrap';
+import { Container, Card, Form, Button, Alert, Tabs, Tab, Row, Col } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
 import { userAPI } from '../services/api';
@@ -68,10 +68,10 @@ const AccountPage = () => {
 
     try {
       await userAPI.updateProfile(formData);
-      setMessage('Profile updated successfully!');
+      setMessage('Profile updated successfully! Your allergy preferences will be applied automatically when browsing recipes.');
       setEditMode(false);
       
-      // Refresh auth context to update user data
+      // Refresh auth context to update user data everywhere
       await refreshProfile();
     } catch (error) {
       setError(error.response?.data?.error || 'Failed to update profile');
@@ -136,24 +136,40 @@ const AccountPage = () => {
               <h4 className="mb-0">Account Settings</h4>
             </Card.Header>
             <Card.Body>
-              {/* Add Tabs for Account Settings and My Recipes */}
               <Tabs defaultActiveKey="settings" className="account-tabs mb-4">
                 <Tab eventKey="settings" title="Settings">
                   {message && <Alert variant="success" className="alert-success-custom">{message}</Alert>}
                   {error && <Alert variant="danger" className="alert-danger-custom">{error}</Alert>}
 
                   <Form>
-                    <Form.Group className="mb-3">
-                      <Form.Label className="form-label-custom">Email Address</Form.Label>
-                      <Form.Control
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        disabled={!editMode}
-                        className="form-control-custom"
-                      />
-                    </Form.Group>
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label className="form-label-custom">Username</Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleInputChange}
+                            disabled={!editMode}
+                            className="form-control-custom"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label className="form-label-custom">Email Address</Form.Label>
+                          <Form.Control
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            disabled={!editMode}
+                            className="form-control-custom"
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
 
                     <Form.Group className="mb-3">
                       <Form.Label className="form-label-custom">Password</Form.Label>
@@ -163,27 +179,51 @@ const AccountPage = () => {
                         disabled
                         className="form-control-custom"
                       />
+                      <Form.Text className="text-muted">
+                        Contact support to change your password
+                      </Form.Text>
                     </Form.Group>
 
-                    {/* Dietary Restrictions and Allergies Section */}
-                    <Form.Group className="mb-4">
-                      <Form.Label className="mb-3 form-label-custom">
-                        <strong>Dietary Restrictions and Allergies</strong>
-                      </Form.Label>
-                      
-                      <div className={editMode ? '' : 'pe-none opacity-75'}>
-                        <AllergySelector
-                          selected={formData.allergies}
-                          onSelect={handleAllergyChange}
-                        />
-                      </div>
-                      
-                      {!editMode && formData.allergies.length === 0 && (
-                        <p className="text-muted mt-2 mb-0">
-                          <em>No allergies selected</em>
-                        </p>
-                      )}
-                    </Form.Group>
+                    {/* Enhanced Dietary Restrictions and Allergies Section */}
+                    <Card className="mb-4">
+                      <Card.Header className="bg-light">
+                        <h6 className="mb-0 d-flex align-items-center">
+                          <span className="me-2">🚫</span>
+                          Dietary Restrictions and Allergies
+                        </h6>
+                      </Card.Header>
+                      <Card.Body>
+                        <Form.Text className="text-muted mb-3 d-block">
+                          Select your allergies and dietary restrictions. These will be automatically filtered out when you browse recipes to ensure your safety and preferences.
+                        </Form.Text>
+                        
+                        <div className={editMode ? '' : 'pe-none opacity-75'}>
+                          <AllergySelector
+                            selected={formData.allergies}
+                            onSelect={handleAllergyChange}
+                            userAllergies={formData.allergies} // Pass current allergies as user allergies
+                          />
+                        </div>
+                        
+                        {!editMode && formData.allergies.length === 0 && (
+                          <Alert variant="info" className="mt-3 mb-0">
+                            <small>
+                              <strong>No allergies selected.</strong> You can add your allergies to automatically filter out recipes that may contain allergens.
+                            </small>
+                          </Alert>
+                        )}
+                        
+                        {!editMode && formData.allergies.length > 0 && (
+                          <Alert variant="success" className="mt-3 mb-0">
+                            <small>
+                              <strong>Active allergy filters:</strong> {formData.allergies.join(', ')}
+                              <br />
+                              <em>These ingredients will be automatically filtered out when browsing recipes.</em>
+                            </small>
+                          </Alert>
+                        )}
+                      </Card.Body>
+                    </Card>
 
                     <div className="d-flex gap-2">
                       {!editMode ? (
@@ -191,7 +231,7 @@ const AccountPage = () => {
                           className="btn-main w-100"
                           onClick={() => setEditMode(true)}
                         >
-                          Update Account
+                          Edit Profile
                         </Button>
                       ) : (
                         <>
@@ -208,7 +248,7 @@ const AccountPage = () => {
                             onClick={handleSave}
                             disabled={updating}
                           >
-                            {updating ? 'Saving...' : 'Save'}
+                            {updating ? 'Saving...' : 'Save Changes'}
                           </Button>
                         </>
                       )}
@@ -230,8 +270,15 @@ const AccountPage = () => {
                       {formData.allergies.length > 0 && (
                         <div className="mb-2">
                           <strong>Active Allergy Filters:</strong> {formData.allergies.length} selected
+                          <br />
+                          <small className="text-muted">
+                            Recipes containing {formData.allergies.join(', ')} will be automatically filtered out
+                          </small>
                         </div>
                       )}
+                      <div className="mb-0">
+                        <strong>Auto-filtering:</strong> {formData.allergies.length > 0 ? 'Enabled' : 'Disabled'}
+                      </div>
                     </Card.Body>
                   </Card>
                 </Tab>
