@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Modal, Form, Button, Alert, Row, Col } from "react-bootstrap";
-import RecipeIngredientsList from "./RecipeIngredientsList";
-import RecipeInstructionsList from "./RecipeInstructionsList";
-import { communityAPI } from "../../services/api";
+import RecipeIngredientsList from "../shared/RecipeIngredientsList";
+import RecipeInstructionsList from "../shared/RecipeInstructionsList";
+import { communityAPI } from "../../../services/api";
 
 function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
     const [formData, setFormData] = useState({

@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
-import "../../styles/community/recipe-instructions-list.css";
+import "../../../styles/community/recipe-instructions-list.css";
 
 function RecipeInstructionsList({ instructions, onChange }) {
   function handleInstructionChange(index, value) {

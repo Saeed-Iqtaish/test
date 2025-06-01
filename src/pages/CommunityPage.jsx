@@ -3,12 +3,12 @@ import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "../components/auth/AuthModal";
-import CommunityHeader from "../components/community/CommunityHeader";
-import CommunityControls from "../components/community/CommunityControls";
-import FilterModal from "../components/filterPanel/FilterModal"; // Changed import
+import CommunityHeader from "../components/community/list/CommunityHeader";
+import CommunityControls from "../components/community/list/CommunityControls";
+import FilterModal from "../components/filterPanel/FilterModal";
 import RecipeList from "../components/global/RecipeList";
 import RecipeDetails from "../components/global/RecipeDetails";
-import CreateRecipeModal from "../components/community/CreateRecipeModal";
+import CreateRecipeModal from "../components/community/list/CreateRecipeModal";
 import "../styles/global/global.css";
 
 function CommunityPage() {

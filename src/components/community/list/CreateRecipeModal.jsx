@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import CreateRecipeForm from "./CreateRecipeForm";
-import "../../styles/community/create-recipe-modal.css";
+import "../../../styles/community/create-recipe-modal.css";
 
 function CreateRecipeModal({ show, onHide, onSuccess }) {
   const [error, setError] = useState("");

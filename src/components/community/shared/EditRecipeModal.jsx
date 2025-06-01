@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, Spinner, Row, Col } from "react-bootstrap";
 import RecipeIngredientsList from "./RecipeIngredientsList";
 import RecipeInstructionsList from "./RecipeInstructionsList";
-import { communityAPI } from "../../services/api";
+import { communityAPI } from "../../../services/api";
 
 function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
   const [formData, setFormData] = useState({
@@ -292,9 +292,14 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
             <details className="mt-3">
               <summary className="text-muted small">Debug Info (Dev Only)</summary>
               <pre className="small text-muted mt-2">
+                Form Data: {JSON.stringify({
+                  title: formData.title,
+                  prepTime: formData.prepTime,
+                  servings: formData.servings,
+                  hasImage: !!formData.image
+                }, null, 2)}
                 Ingredients: {JSON.stringify(ingredients, null, 2)}
                 Instructions: {JSON.stringify(instructions, null, 2)}
-                Form Data: {JSON.stringify(formData, null, 2)}
               </pre>
             </details>
           )}
@@ -307,7 +312,7 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
           <Button
             variant="primary"
             type="submit"
-            disabled={loading || !formData.title.trim() || !isInitialized}
+            disabled={loading || !formData.title.trim() || !formData.prepTime || !formData.servings || !isInitialized}
           >
             {loading ? (
               <>

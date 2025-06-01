@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react'; // Add useCallback
+import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Spinner, Alert, Button, Card } from 'react-bootstrap';
 import { FiEdit3, FiTrash2, FiEye } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { userAPI, communityAPI } from '../../services/api';
-import EditRecipeModal from '../community/EditRecipeModal';
-import MoodBadge from '../global/MoodBadge';
+import { userAPI, communityAPI } from '../../../services/api';  // ✅ Fixed: 3 levels up
+import EditRecipeModal from '../../community/shared/EditRecipeModal';  // ✅ Fixed: 2 levels up
+import MoodBadge from '../../global/MoodBadge';  // ✅ Fixed: 2 levels up
 
 function MyRecipes() {
     const [recipes, setRecipes] = useState([]);
@@ -58,8 +58,6 @@ function MyRecipes() {
         fetchMyRecipes();
     }, [fetchMyRecipes]); // Now fetchMyRecipes is properly memoized
 
-
-
     const handleEdit = (recipe) => {
         // Debug: Log the recipe data structure before editing
         console.log('🔍 Recipe data being passed to edit modal:', {
@@ -108,7 +106,6 @@ function MyRecipes() {
         setSelectedRecipe(null);
         fetchMyRecipes(); // Refresh the list
     };
-
 
     const fetchFullRecipeData = async (recipeId) => {
         try {

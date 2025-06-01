@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Badge, Alert, Spinner } from "react-bootstrap";
 import { FiUser, FiClock, FiEdit3 } from "react-icons/fi";
-import EditRecipe from "./EditRecipe";
+import EditRecipe from "../list/EditRecipe";
 //import "../../styles/community/recipe-details-modal.css";
 
 function RecipeDetails({ show, onHide, recipe, onRecipeUpdated }) {

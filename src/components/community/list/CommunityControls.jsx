@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 import { FiPlus, FiFilter } from "react-icons/fi";
-import SearchBar from "../global/SearchBar";
-import "../../styles/community/community-controls.css";
+import SearchBar from "../../global/SearchBar";
+import "../../../styles/community/community-controls.css";
 
 function CommunityControls({ 
   searchTerm, 

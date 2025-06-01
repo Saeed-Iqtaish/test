@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
-import "../../styles/community/recipe-ingredients-list.css";
+import "../../../styles/community/recipe-ingredients-list.css";
 
 function RecipeIngredientsList({ ingredients, onChange }) {
   function handleIngredientChange(index, value) {

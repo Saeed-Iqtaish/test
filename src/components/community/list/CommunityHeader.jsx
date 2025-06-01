@@ -1,5 +1,5 @@
 import React from "react";
-import "../../styles/community/recipe-header.css";
+import "../../../styles/community/recipe-header.css";
 
 function CommunityHeader() {
   return (
