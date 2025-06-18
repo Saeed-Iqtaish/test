@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      // Use userAPI.getProfile to get complete user data including allergies
       const response = await userAPI.getProfile();
       setUser(response.data);
       setIsAuthenticated(true);
@@ -49,7 +48,6 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem('token', token);
 
-      // Fetch complete user profile after login
       const profileResponse = await userAPI.getProfile();
       setUser(profileResponse.data);
       setIsAuthenticated(true);
@@ -71,7 +69,6 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem('token', token);
 
-      // Fetch complete user profile after signup
       const profileResponse = await userAPI.getProfile();
       setUser(profileResponse.data);
       setIsAuthenticated(true);

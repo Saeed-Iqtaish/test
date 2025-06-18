@@ -2,7 +2,6 @@ import React from "react";
 
 function RecipeIngredients({ recipeDetails, isCommunityRecipe = false }) {
   if (isCommunityRecipe) {
-    // Handle community recipe ingredients
     if (!recipeDetails?.ingredients || recipeDetails.ingredients.length === 0) {
       return (
         <div className="text-center p-4">
@@ -25,7 +24,6 @@ function RecipeIngredients({ recipeDetails, isCommunityRecipe = false }) {
     );
   }
 
-  // Handle Spoonacular recipe ingredients
   if (!recipeDetails?.extendedIngredients || recipeDetails.extendedIngredients.length === 0) {
     return (
       <div className="text-center p-4">

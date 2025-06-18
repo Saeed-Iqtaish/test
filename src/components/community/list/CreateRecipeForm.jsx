@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal, Form, Button, Alert, Row, Col } from "react-bootstrap";
 import RecipeIngredientsList from "../shared/RecipeIngredientsList";
 import RecipeInstructionsList from "../shared/RecipeInstructionsList";
+import RecipeMoodSelector from "../shared/RecipeMoodSelector";
 import { communityAPI } from "../../../services/api";
 
 function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
@@ -10,6 +11,7 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
         prepTime: "",
         servings: "",
         image: null,
+        mood: "",
         ingredients: [""],
         instructions: [""]
     });
@@ -31,6 +33,10 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
 
     function handleInstructionsChange(instructions) {
         setFormData(prev => ({ ...prev, instructions }));
+    }
+
+    function handleMoodChange(mood) {
+        setFormData(prev => ({ ...prev, mood }));
     }
 
     async function handleSubmit(e) {
@@ -56,6 +62,12 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
             return;
         }
 
+        if (!formData.mood) {
+            onError("Please select a mood for your recipe");
+            setLoading(false);
+            return;
+        }
+
         const validIngredients = formData.ingredients.filter(ing => ing.trim());
         const validInstructions = formData.instructions.filter(inst => inst.trim());
 
@@ -76,6 +88,7 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
             submitData.append("title", formData.title.trim());
             submitData.append("prep_time", parseInt(formData.prepTime));
             submitData.append("servings", parseInt(formData.servings));
+            submitData.append("mood", formData.mood);
             submitData.append("ingredients", JSON.stringify(validIngredients));
             submitData.append("instructions", JSON.stringify(validInstructions));
 
@@ -83,7 +96,7 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
                 submitData.append("image", formData.image);
             }
 
-            console.log('🚀 Submitting recipe with authenticated API...');
+            console.log('🚀 Submitting recipe with mood:', formData.mood);
             
             await communityAPI.createRecipe(submitData);
 
@@ -94,6 +107,7 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
                 prepTime: "",
                 servings: "",
                 image: null,
+                mood: "",
                 ingredients: [""],
                 instructions: [""]
             });
@@ -179,6 +193,12 @@ function CreateRecipeForm({ onSuccess, onError, onCancel, error }) {
                         Upload an image for your recipe (optional, max 5MB)
                     </Form.Text>
                 </Form.Group>
+
+                <RecipeMoodSelector
+                    selectedMood={formData.mood}
+                    onMoodChange={handleMoodChange}
+                    disabled={loading}
+                />
 
                 <RecipeIngredientsList
                     ingredients={formData.ingredients}

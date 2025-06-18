@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, Spinner, Row, Col } from "react-bootstrap";
 import RecipeIngredientsList from "./RecipeIngredientsList";
 import RecipeInstructionsList from "./RecipeInstructionsList";
+import RecipeMoodSelector from "../shared/RecipeMoodSelector";
 import { communityAPI } from "../../../services/api";
 
 function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
@@ -9,6 +10,7 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
     title: "",
     prepTime: "",
     servings: "",
+    mood: "Happy",
     image: null
   });
   const [ingredients, setIngredients] = useState([""]);
@@ -33,6 +35,7 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
       title: recipeData.title || "",
       prepTime: recipeData.prep_time?.toString() || "",
       servings: recipeData.servings?.toString() || "",
+      mood: recipeData.mood || "Happy", // Get mood from database or default to Happy
       image: null
     });
 
@@ -79,6 +82,7 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
       title: "",
       prepTime: "",
       servings: "",
+      mood: "Happy",
       image: null
     });
     setIngredients([""]);
@@ -95,70 +99,92 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
     }));
   };
 
-  const handleIngredientsChange = (newIngredients) => {
-    setIngredients(newIngredients);
+  function handleMoodChange(mood) {
+    setFormData(prev => ({ ...prev, mood }));
+  }
+
+  const handleIngredientsChange = (updatedIngredients) => {
+    setIngredients(updatedIngredients);
   };
 
-  const handleInstructionsChange = (newInstructions) => {
-    setInstructions(newInstructions);
+  const handleInstructionsChange = (updatedInstructions) => {
+    setInstructions(updatedInstructions);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!recipe?.id) return;
-
     setLoading(true);
     setError("");
 
-    if (!formData.title.trim()) {
-      setError("Recipe title is required");
-      setLoading(false);
-      return;
-    }
-
-    if (!formData.prepTime || parseInt(formData.prepTime) <= 0) {
-      setError("Valid prep time is required");
-      setLoading(false);
-      return;
-    }
-
-    if (!formData.servings || parseInt(formData.servings) <= 0) {
-      setError("Valid number of servings is required");
-      setLoading(false);
-      return;
-    }
-
-    const validIngredients = ingredients.filter(ing => ing && ing.trim());
-    const validInstructions = instructions.filter(inst => inst && inst.trim());
-
-    if (validIngredients.length === 0) {
-      setError("At least one ingredient is required");
-      setLoading(false);
-      return;
-    }
-
-    if (validInstructions.length === 0) {
-      setError("At least one instruction is required");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const submitData = new FormData();
-      submitData.append("title", formData.title.trim());
-      submitData.append("prep_time", parseInt(formData.prepTime));
-      submitData.append("servings", parseInt(formData.servings));
-      submitData.append("ingredients", JSON.stringify(validIngredients));
-      submitData.append("instructions", JSON.stringify(validInstructions));
-
-      if (formData.image) {
-        submitData.append("image", formData.image);
+      // Validation
+      if (!formData.title.trim()) {
+        setError("Recipe title is required");
+        setLoading(false);
+        return;
       }
 
-      console.log('🔄 Updating recipe with ID:', recipe.id);
-      await communityAPI.updateRecipe(recipe.id, submitData);
+      if (!formData.prepTime || formData.prepTime <= 0) {
+        setError("Valid prep time is required");
+        setLoading(false);
+        return;
+      }
 
-      console.log('✅ Recipe updated successfully!');
+      if (!formData.servings || formData.servings <= 0) {
+        setError("Valid number of servings is required");
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.mood) {
+        setError("Please select a mood for your recipe");
+        setLoading(false);
+        return;
+      }
+
+      const validIngredients = ingredients.filter(ing => ing.trim());
+      const validInstructions = instructions.filter(inst => inst.trim());
+
+      if (validIngredients.length === 0) {
+        setError("At least one ingredient is required");
+        setLoading(false);
+        return;
+      }
+
+      if (validInstructions.length === 0) {
+        setError("At least one instruction is required");
+        setLoading(false);
+        return;
+      }
+
+      // Create FormData for the API request
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title.trim());
+      formDataToSend.append('prep_time', parseInt(formData.prepTime));
+      formDataToSend.append('servings', parseInt(formData.servings));
+      formDataToSend.append('mood', formData.mood);
+
+      // Add ingredients and instructions
+      formDataToSend.append('ingredients', JSON.stringify(validIngredients));
+      formDataToSend.append('instructions', JSON.stringify(validInstructions));
+
+      // Add image if provided
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
+      }
+
+      console.log('🚀 Updating recipe with data:', {
+        title: formData.title,
+        prep_time: formData.prepTime,
+        servings: formData.servings,
+        mood: formData.mood,
+        ingredients: validIngredients,
+        instructions: validInstructions,
+        hasImage: !!formData.image
+      });
+
+      await communityAPI.updateRecipe(recipe.id, formDataToSend);
+      console.log('✅ Recipe updated successfully');
       onRecipeUpdated();
       onHide();
     } catch (err) {
@@ -234,6 +260,7 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
                 </Form.Text>
               </Form.Group>
             </Col>
+
             <Col md={6}>
               <Form.Group>
                 <Form.Label>Servings *</Form.Label>
@@ -267,6 +294,12 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
             </Form.Text>
           </Form.Group>
 
+          <RecipeMoodSelector
+            selectedMood={formData.mood}
+            onMoodChange={handleMoodChange}
+            disabled={loading}
+          />
+
           <RecipeIngredientsList
             ingredients={ingredients}
             onChange={handleIngredientsChange}
@@ -286,6 +319,7 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
                   title: formData.title,
                   prepTime: formData.prepTime,
                   servings: formData.servings,
+                  mood: formData.mood,
                   hasImage: !!formData.image
                 }, null, 2)}
                 Ingredients: {JSON.stringify(ingredients, null, 2)}
@@ -302,7 +336,7 @@ function EditRecipeModal({ show, onHide, recipe, onRecipeUpdated }) {
           <Button
             variant="primary"
             type="submit"
-            disabled={loading || !formData.title.trim() || !formData.prepTime || !formData.servings || !isInitialized}
+            disabled={loading || !formData.title.trim() || !formData.prepTime || !formData.servings || !formData.mood || !isInitialized}
           >
             {loading ? (
               <>

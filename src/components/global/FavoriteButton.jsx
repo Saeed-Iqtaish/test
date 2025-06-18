@@ -7,9 +7,9 @@ import "../../styles/global/favorite_button.css";
 
 function FavoriteButton({ 
   recipeId, 
-  isCommunityRecipe = false, // boolean instead of string
+  isCommunityRecipe = false,
   onFavoriteChange,
-  onLoginRequired // New prop for handling login prompt
+  onLoginRequired
 }) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -37,12 +37,10 @@ function FavoriteButton({
   }, [recipeId, isCommunityRecipe, isAuthenticated, checkIfFavorited]);
 
   async function handleToggleFavorite() {
-    // Show login prompt if not authenticated
     if (!isAuthenticated) {
       if (onLoginRequired) {
         onLoginRequired();
       } else {
-        // Fallback alert if no login handler provided
         alert("Please log in to save favorites");
       }
       return;
@@ -63,7 +61,6 @@ function FavoriteButton({
     } catch (error) {
       console.error("Error toggling favorite:", error);
       
-      // Handle specific error cases
       if (error.response?.status === 401) {
         alert("Please log in again to save favorites");
       } else if (error.response?.status === 400 && error.response?.data?.error?.includes('foreign key')) {
@@ -76,7 +73,6 @@ function FavoriteButton({
     }
   }
 
-  // Always show the button, but style differently based on auth status
   return (
     <Button
       variant="link"

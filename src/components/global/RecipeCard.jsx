@@ -4,6 +4,7 @@ import { FiEdit3 } from "react-icons/fi";
 import MoodBadge from "./MoodBadge";
 import RecipeNotesModal from "../favorites/RecipeNotesModal";
 import FavoriteButton from './FavoriteButton';
+import RatingDisplay from "../ratings/RatingDisplay";
 import { AuthModal } from "../auth/AuthModal";
 import { notesAPI } from "../../services/api";
 import "../../styles/global/recipe-card.css";
@@ -119,23 +120,32 @@ function RecipeCard({
         <Card.Body className="d-flex flex-column">
           <div className="d-flex justify-content-between mb-2 align-items-start">
             <MoodBadge mood={mood} />
-            {showFavoriteButton() && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <FavoriteButton 
+            <div className="d-flex align-items-center gap-2">
+              {isActuallyCommunityRecipe && (
+                <RatingDisplay
                   recipeId={recipe.id}
-                  isCommunityRecipe={isActuallyCommunityRecipe}
-                  onFavoriteChange={onFavoriteChange}
-                  onLoginRequired={handleLoginRequired}
+                  isCommunityRecipe={true}
+                  size="xs"
+                  className="rating-on-card"
                 />
-              </div>
-            )}
+              )}
+              {showFavoriteButton() && (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <FavoriteButton 
+                    recipeId={recipe.id}
+                    isCommunityRecipe={isActuallyCommunityRecipe}
+                    onFavoriteChange={onFavoriteChange}
+                    onLoginRequired={handleLoginRequired}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           <Card.Title as="h6" className="recipe-title">
             {title}
           </Card.Title>
 
-          {/* Community Recipe Content */}
           {isActuallyCommunityRecipe && !isFavoritesPage && (
             <>
               <Card.Text className="text-muted" style={{ fontSize: "0.85rem" }}>
@@ -156,7 +166,7 @@ function RecipeCard({
                 </small>
               </div>
             </>
-          )};
+          )}
 
           {isFavoritesPage && (
             <>

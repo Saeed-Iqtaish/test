@@ -9,7 +9,6 @@ function RecipeNutrition({ nutrition }) {
     );
   }
 
-  // Filter to show only the most important nutrients
   const importantNutrients = ['Calories', 'Protein', 'Fat', 'Carbohydrates', 'Fiber', 'Sugar', 'Sodium'];
   
   const filteredNutrients = nutrition.nutrients.filter(nutrient => 

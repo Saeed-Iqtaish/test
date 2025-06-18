@@ -5,6 +5,7 @@ const useCommunityRecipe = (id) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Keep assignMood as fallback for recipes without mood in DB
   const assignMood = useCallback((recipe) => {
     const text = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
 
@@ -43,12 +44,16 @@ const useCommunityRecipe = (id) => {
       
       const data = await response.json();
       console.log('Community recipe data:', data);
+      console.log('Recipe mood from DB:', data.mood);
       
+      // For community recipes, use the mood from database
       const recipeWithMood = {
         ...data,
-        mood: assignMood(data)
+        // Use the mood from database if it exists, otherwise fallback to assignMood
+        mood: data.mood || assignMood(data)
       };
       
+      console.log('Final recipe mood:', recipeWithMood.mood);
       setRecipe(recipeWithMood);
     } catch (err) {
       console.error('Error fetching community recipe:', err);

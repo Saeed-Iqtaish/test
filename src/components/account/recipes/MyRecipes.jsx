@@ -22,9 +22,11 @@ function MyRecipes() {
             setError('');
             const response = await userAPI.getMyRecipes();
 
+            // For community recipes, use the mood from database, don't auto-generate
             const recipesWithMood = response.data.map(recipe => ({
                 ...recipe,
-                mood: assignMood(recipe)
+                // Use the mood from the database if it exists, otherwise fallback to assignMood
+                mood: recipe.mood || assignMood(recipe)
             }));
 
             setRecipes(recipesWithMood);
@@ -36,6 +38,7 @@ function MyRecipes() {
         }
     }, []);
 
+    // Keep assignMood as fallback for recipes without a mood in DB
     const assignMood = (recipe) => {
         const text = `${recipe.title} ${recipe.summary || ""}`.toLowerCase();
 
@@ -62,6 +65,7 @@ function MyRecipes() {
             title: recipe.title,
             prep_time: recipe.prep_time,
             servings: recipe.servings,
+            mood: recipe.mood, // This should now be the actual DB mood
             ingredients: recipe.ingredients,
             instructions: recipe.instructions,
             hasImage: !!recipe.image_data
@@ -76,65 +80,67 @@ function MyRecipes() {
         }
     };
 
+    const fetchFullRecipeData = async (recipeId) => {
+        try {
+            const response = await communityAPI.getRecipe(recipeId);
+            const fullRecipe = {
+                ...response.data,
+                // Use the mood from database, not auto-generated
+                mood: response.data.mood || assignMood(response.data)
+            };
+            setSelectedRecipe(fullRecipe);
+            setShowEditModal(true);
+        } catch (error) {
+            console.error('Error fetching full recipe data:', error);
+            setError('Failed to load recipe details');
+        }
+    };
+
     const handleView = (recipe) => {
         navigate(`/community/${recipe.id}`);
     };
 
     const handleDelete = async (recipeId) => {
-        if (!window.confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
-            return;
-        }
+        if (!window.confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) return;
 
-        setDeleteLoading(recipeId);
         try {
+            setDeleteLoading(recipeId);
             await communityAPI.deleteRecipe(recipeId);
+            
+            // Remove the deleted recipe from state
             setRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
+            
+            console.log('✅ Recipe deleted successfully');
         } catch (error) {
             console.error('Error deleting recipe:', error);
-            alert('Failed to delete recipe. Please try again.');
+            setError('Failed to delete recipe');
         } finally {
             setDeleteLoading(null);
         }
     };
 
     const handleRecipeUpdated = () => {
+        // Refresh the recipes list to show updated data
+        fetchMyRecipes();
         setShowEditModal(false);
         setSelectedRecipe(null);
-        fetchMyRecipes();
-    };
-
-    const fetchFullRecipeData = async (recipeId) => {
-        try {
-            setLoading(true);
-            const response = await communityAPI.getRecipe(recipeId);
-            const fullRecipe = response.data;
-
-            console.log('📋 Full recipe data fetched:', fullRecipe);
-
-            setSelectedRecipe(fullRecipe);
-            setShowEditModal(true);
-        } catch (error) {
-            console.error('Error fetching full recipe data:', error);
-            alert('Failed to load recipe details for editing.');
-        } finally {
-            setLoading(false);
-        }
     };
 
     if (loading) {
         return (
-            <div className="text-center py-4">
-                <Spinner animation="border" />
-                <p className="mt-2">Loading your recipes...</p>
+            <div className="text-center py-5">
+                <Spinner animation="border" variant="primary" />
+                <p className="mt-3">Loading your recipes...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <Alert variant="danger">
-                {error}
-                <Button variant="outline-danger" size="sm" className="ms-2" onClick={fetchMyRecipes}>
+            <Alert variant="danger" className="mb-4">
+                <Alert.Heading>Error</Alert.Heading>
+                <p>{error}</p>
+                <Button variant="outline-danger" onClick={fetchMyRecipes}>
                     Try Again
                 </Button>
             </Alert>
@@ -144,8 +150,10 @@ function MyRecipes() {
     if (recipes.length === 0) {
         return (
             <div className="text-center py-5">
-                <h5>No recipes yet</h5>
-                <p className="text-muted">You haven't created any recipes yet. Start sharing your favorite recipes with the community!</p>
+                <h4 className="text-muted mb-3">No recipes yet</h4>
+                <p className="text-muted mb-4">
+                    Start sharing your favorite recipes with the community!
+                </p>
                 <Button className="btn-main" onClick={() => navigate('/community')}>
                     Go to Community
                 </Button>
@@ -172,63 +180,56 @@ function MyRecipes() {
                                     <MoodBadge mood={recipe.mood} />
                                     <div className="d-flex align-items-center gap-1">
                                         {recipe.approved ? (
-                                            <span className="badge bg-success">✓ Approved</span>
+                                            <span className="badge bg-success">Approved</span>
                                         ) : (
-                                            <span className="badge bg-warning">⏳ Pending</span>
+                                            <span className="badge bg-warning">Pending</span>
                                         )}
                                     </div>
                                 </div>
 
-                                <Card.Title className="recipe-title h6">{recipe.title}</Card.Title>
-
-                                <div className="recipe-meta text-muted mb-3">
-                                    <small>
-                                        Created: {new Date(recipe.created_at).toLocaleDateString()}
+                                <Card.Title className="mb-2">{recipe.title}</Card.Title>
+                                
+                                <div className="mb-2">
+                                    <small className="text-muted">
+                                        ⏱️ {recipe.prep_time} mins • 🍽️ {recipe.servings} servings
                                     </small>
-                                    {recipe.updated_at !== recipe.created_at && (
-                                        <small className="d-block">
-                                            Updated: {new Date(recipe.updated_at).toLocaleDateString()}
-                                        </small>
-                                    )}
                                 </div>
 
-                                <div className="mt-auto">
-                                    <div className="d-flex gap-2">
-                                        <Button
-                                            variant="outline-primary"
-                                            size="sm"
-                                            onClick={() => handleView(recipe)}
-                                            className="flex-fill btn-view-custom"
-                                        >
-                                            <FiEye className="me-1" />
-                                            View
-                                        </Button>
-                                        <Button
-                                            variant="outline-secondary"
-                                            size="sm"
-                                            onClick={() => handleEdit(recipe)}
-                                            className="flex-fill btn-edit-custom"
-                                        >
-                                            <FiEdit3 className="me-1" />
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            variant="outline-danger"
-                                            size="sm"
-                                            onClick={() => handleDelete(recipe.id)}
-                                            disabled={deleteLoading === recipe.id}
-                                            className="flex-fill btn-delete-custom"
-                                        >
-                                            {deleteLoading === recipe.id ? (
-                                                <Spinner size="sm" />
-                                            ) : (
-                                                <>
-                                                    <FiTrash2 className="me-1" />
-                                                    Delete
-                                                </>
-                                            )}
-                                        </Button>
-                                    </div>
+                                <div className="mt-auto d-flex gap-2">
+                                    <Button
+                                        variant="outline-primary"
+                                        size="sm"
+                                        onClick={() => handleView(recipe)}
+                                        className="flex-fill"
+                                    >
+                                        <FiEye className="me-1" />
+                                        View
+                                    </Button>
+                                    <Button
+                                        variant="outline-secondary"
+                                        size="sm"
+                                        onClick={() => handleEdit(recipe)}
+                                        className="flex-fill"
+                                    >
+                                        <FiEdit3 className="me-1" />
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
+                                        onClick={() => handleDelete(recipe.id)}
+                                        disabled={deleteLoading === recipe.id}
+                                        className="flex-fill"
+                                    >
+                                        {deleteLoading === recipe.id ? (
+                                            <Spinner size="sm" />
+                                        ) : (
+                                            <>
+                                                <FiTrash2 className="me-1" />
+                                                Delete
+                                            </>
+                                        )}
+                                    </Button>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -236,9 +237,13 @@ function MyRecipes() {
                 ))}
             </Row>
 
+            {/* Edit Recipe Modal */}
             <EditRecipeModal
                 show={showEditModal}
-                onHide={() => setShowEditModal(false)}
+                onHide={() => {
+                    setShowEditModal(false);
+                    setSelectedRecipe(null);
+                }}
                 recipe={selectedRecipe}
                 onRecipeUpdated={handleRecipeUpdated}
             />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Form, Alert } from 'react-bootstrap';
+import { Card, Alert } from 'react-bootstrap';
 import AllergySelector from '../../filterPanel/AllergySelector';
 
 function DietaryRestrictionsCard({
@@ -16,9 +16,6 @@ function DietaryRestrictionsCard({
         </h6>
       </Card.Header>
       <Card.Body>
-        <Form.Text className="text-muted mb-3 d-block">
-          Select your allergies and dietary restrictions. These will be automatically filtered out when you browse recipes to ensure your safety and preferences.
-        </Form.Text>
         
         <div className={editMode ? '' : 'pe-none opacity-75'}>
           <AllergySelector
@@ -27,14 +24,6 @@ function DietaryRestrictionsCard({
             userAllergies={allergies}
           />
         </div>
-        
-        {!editMode && allergies.length === 0 && (
-          <Alert variant="info" className="mt-3 mb-0">
-            <small>
-              <strong>No allergies selected.</strong> You can add your allergies to automatically filter out recipes that may contain allergens.
-            </small>
-          </Alert>
-        )}
         
         {!editMode && allergies.length > 0 && (
           <Alert variant="success" className="mt-3 mb-0">

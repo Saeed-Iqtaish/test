@@ -12,6 +12,7 @@ import EditRecipeModal from '../components/community/shared/EditRecipeModal';
 import { AuthModal } from '../components/auth/AuthModal';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/pages/community-recipe-page.css';
+import RecipeRating from '../components/ratings/RecipeRating';
 
 function CommunityRecipePage() {
   const { id } = useParams();
@@ -117,6 +118,16 @@ function CommunityRecipePage() {
             recipe={recipe} 
             className="mb-4" 
           />
+
+          <div className="rating-section mb-4">
+            <RecipeRating
+              recipeId={recipe.id}
+              isCommunityRecipe={true}
+              size="md"
+              showUserRating={true}
+              className="border rounded p-3 bg-light"
+            />
+          </div>
 
           <RecipeNotes recipeId={recipe.id} />
         </Col>

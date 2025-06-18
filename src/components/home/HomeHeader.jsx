@@ -1,4 +1,3 @@
-// src/components/home/EnhancedHomeHeader.jsx
 import React from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import "../../styles/home/home-header.css";
@@ -20,7 +19,6 @@ function HomeHeader() {
         </p>
       </div>
 
-      {/* Show user allergy info if they have allergies set */}
       {isAuthenticated && user?.allergies && user.allergies.length > 0 && (
         <div className="mt-3 text-center">
           <div className="d-inline-flex align-items-center bg-white bg-opacity-25 rounded-pill px-3 py-2">

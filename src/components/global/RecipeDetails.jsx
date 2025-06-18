@@ -6,6 +6,7 @@ import MoodBadge from "../global/MoodBadge";
 import RecipeIngredients from "../recipeDetails/RecipeIngredients";
 import RecipeInstructions from "../recipeDetails/RecipeInstructions";
 import RecipeNotes from "../recipeDetails/RecipeNotes";
+import RecipeRating from "../ratings/RecipeRating";
 
 function RecipeDetails({
   show,
@@ -171,6 +172,18 @@ function RecipeDetails({
                       console.error('Error loading recipe image:', e.target.src);
                       e.target.style.display = 'none';
                     }}
+                  />
+                </div>
+              )}
+
+              {isCommunityRecipe && (
+                <div className="rating-section mb-4">
+                  <RecipeRating
+                    recipeId={recipe.id}
+                    isCommunityRecipe={true}
+                    size="sm"
+                    showUserRating={true}
+                    className="border rounded p-3 bg-light"
                   />
                 </div>
               )}

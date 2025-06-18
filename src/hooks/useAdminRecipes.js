@@ -1,4 +1,3 @@
-// hooks/useAdminRecipes.js
 import { useState, useCallback } from 'react';
 import { communityAPI } from '../services/api';
 import { useMoodAssignment } from './useMoodAssignment';

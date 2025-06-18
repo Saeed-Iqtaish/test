@@ -70,29 +70,29 @@ function RecipeList({
     };
   }, [search, diet, allergy, mood, assignMood]);
 
-  const fetchCommunityRecipes = useCallback(async (controller) => {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/community`, {
-      signal: controller.signal
-    });
-    let filteredRecipes = response.data;
+const fetchCommunityRecipes = useCallback(async (controller) => {
+  const response = await axios.get(`${process.env.REACT_APP_API_URL}/community`, {
+    signal: controller.signal
+  });
+  let filteredRecipes = response.data;
 
-    if (search) {
-      filteredRecipes = filteredRecipes.filter(recipe =>
-        recipe.title.toLowerCase().includes(search.toLowerCase())
-      );
-    }
+  if (search) {
+    filteredRecipes = filteredRecipes.filter(recipe =>
+      recipe.title.toLowerCase().includes(search.toLowerCase())
+    );
+  }
 
-    filteredRecipes = filteredRecipes.map(r => ({
-      ...r,
-      mood: assignMood(r),
-    }));
+  filteredRecipes = filteredRecipes.map(r => ({
+    ...r,
+    mood: r.mood || assignMood(r),
+  }));
 
-    if (mood.length > 0) {
-      filteredRecipes = filteredRecipes.filter(r => mood.includes(r.mood));
-    }
+  if (mood.length > 0) {
+    filteredRecipes = filteredRecipes.filter(r => mood.includes(r.mood));
+  }
 
-    return { recipes: filteredRecipes, totalResults: filteredRecipes.length };
-  }, [search, mood, assignMood]);
+  return { recipes: filteredRecipes, totalResults: filteredRecipes.length };
+}, [search, mood, assignMood]);
 
   const fetchFavoriteRecipes = useCallback(async (controller) => {
     try {

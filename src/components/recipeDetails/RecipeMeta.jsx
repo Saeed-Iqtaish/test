@@ -28,7 +28,6 @@ function RecipeMeta({
 
   const getRecipeImage = () => {
     if (isCommunityRecipe) {
-      // Fixed: Use the correct API base URL for community recipe images
       return recipe?.image_data ? 
         `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/community/${recipe.id}/image` : 
         null;
@@ -38,7 +37,6 @@ function RecipeMeta({
 
   return (
     <div className="recipe-meta-section mb-4">
-      {/* Recipe Image */}
       {getRecipeImage() && (
         <div className="recipe-image-section mb-4">
           <img
@@ -58,7 +56,6 @@ function RecipeMeta({
         </div>
       )}
 
-      {/* Meta Information */}
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <div className="recipe-meta-info d-flex gap-4 flex-wrap">
           {!isCommunityRecipe && (
@@ -108,7 +105,6 @@ function RecipeMeta({
           )}
         </div>
         
-        {/* Favorite button only for Spoonacular recipes and authenticated users */}
         {!isCommunityRecipe && isAuthenticated && recipe?.id && (
           <FavoriteButton 
             recipeId={recipe.id} 
@@ -117,7 +113,6 @@ function RecipeMeta({
         )}
       </div>
 
-      {/* Diet Labels for Spoonacular recipes */}
       {!isCommunityRecipe && recipeDetails?.diets && recipeDetails.diets.length > 0 && (
         <div className="diet-badges mb-3">
           {recipeDetails.diets.map((diet) => (

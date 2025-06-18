@@ -15,7 +15,6 @@ const useUserProfile = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  // Initialize form data when user changes
   useEffect(() => {
     if (isAuthenticated && user) {
       setFormData({
@@ -26,7 +25,6 @@ const useUserProfile = () => {
     }
   }, [isAuthenticated, user]);
 
-  // Fetch complete user profile
   const fetchUserProfile = useCallback(async () => {
     if (!isAuthenticated) return;
 
@@ -48,7 +46,6 @@ const useUserProfile = () => {
     }
   }, [isAuthenticated]);
 
-  // Handle input changes
   const handleInputChange = useCallback((e) => {
     setFormData(prev => ({
       ...prev,
@@ -56,7 +53,6 @@ const useUserProfile = () => {
     }));
   }, []);
 
-  // Handle allergy changes
   const handleAllergyChange = useCallback((selectedAllergies) => {
     setFormData(prev => ({
       ...prev,
@@ -64,7 +60,6 @@ const useUserProfile = () => {
     }));
   }, []);
 
-  // Save profile changes
   const handleSave = useCallback(async () => {
     setUpdating(true);
     setError('');
@@ -75,7 +70,6 @@ const useUserProfile = () => {
       setMessage('Profile updated successfully! Your allergy preferences will be applied automatically when browsing recipes.');
       setEditMode(false);
       
-      // Refresh auth context to update user data everywhere
       await refreshProfile();
     } catch (error) {
       setError(error.response?.data?.error || 'Failed to update profile');
@@ -84,7 +78,6 @@ const useUserProfile = () => {
     }
   }, [formData, refreshProfile]);
 
-  // Cancel editing
   const handleCancel = useCallback(() => {
     if (user) {
       setFormData({
@@ -98,26 +91,22 @@ const useUserProfile = () => {
     setMessage('');
   }, [user]);
 
-  // Enter edit mode
   const handleEditMode = useCallback(() => {
     setEditMode(true);
     setError('');
     setMessage('');
   }, []);
 
-  // Clear messages
   const clearMessages = useCallback(() => {
     setMessage('');
     setError('');
   }, []);
 
-  // Initial fetch on mount
   useEffect(() => {
     fetchUserProfile();
   }, [fetchUserProfile]);
 
   return {
-    // State
     formData,
     editMode,
     loading,
@@ -125,7 +114,6 @@ const useUserProfile = () => {
     message,
     error,
     
-    // Actions
     handleInputChange,
     handleAllergyChange,
     handleSave,
@@ -136,5 +124,4 @@ const useUserProfile = () => {
   };
 };
 
-// ✅ IMPORTANT: Make sure you have this default export
 export default useUserProfile;

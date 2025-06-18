@@ -33,7 +33,6 @@ function RecipeDescription({ recipe, recipeDetails, isCommunityRecipe = false })
     );
   }
 
-  // Handle Spoonacular recipes
   return (
     <div className="recipe-summary">
       {recipeDetails?.summary && (
